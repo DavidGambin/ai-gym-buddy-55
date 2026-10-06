@@ -10,33 +10,102 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BibliotecaRouteImport } from './routes/biblioteca'
+import { Route as CoachRouteImport } from './routes/coach'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as RutinaRouteImport } from './routes/rutina'
+import { Route as EjercicioIdRouteImport } from './routes/ejercicio.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BibliotecaRoute = BibliotecaRouteImport.update({
+  id: '/biblioteca',
+  path: '/biblioteca',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoachRoute = CoachRouteImport.update({
+  id: '/coach',
+  path: '/coach',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RutinaRoute = RutinaRouteImport.update({
+  id: '/rutina',
+  path: '/rutina',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EjercicioIdRoute = EjercicioIdRouteImport.update({
+  id: '/ejercicio/$id',
+  path: '/ejercicio/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/biblioteca': typeof BibliotecaRoute
+  '/coach': typeof CoachRoute
+  '/onboarding': typeof OnboardingRoute
+  '/rutina': typeof RutinaRoute
+  '/ejercicio/$id': typeof EjercicioIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/biblioteca': typeof BibliotecaRoute
+  '/coach': typeof CoachRoute
+  '/onboarding': typeof OnboardingRoute
+  '/rutina': typeof RutinaRoute
+  '/ejercicio/$id': typeof EjercicioIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/biblioteca': typeof BibliotecaRoute
+  '/coach': typeof CoachRoute
+  '/onboarding': typeof OnboardingRoute
+  '/rutina': typeof RutinaRoute
+  '/ejercicio/$id': typeof EjercicioIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/biblioteca'
+    | '/coach'
+    | '/onboarding'
+    | '/rutina'
+    | '/ejercicio/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/biblioteca'
+    | '/coach'
+    | '/onboarding'
+    | '/rutina'
+    | '/ejercicio/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/biblioteca'
+    | '/coach'
+    | '/onboarding'
+    | '/rutina'
+    | '/ejercicio/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BibliotecaRoute: typeof BibliotecaRoute
+  CoachRoute: typeof CoachRoute
+  OnboardingRoute: typeof OnboardingRoute
+  RutinaRoute: typeof RutinaRoute
+  EjercicioIdRoute: typeof EjercicioIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +117,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/biblioteca': {
+      id: '/biblioteca'
+      path: '/biblioteca'
+      fullPath: '/biblioteca'
+      preLoaderRoute: typeof BibliotecaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coach': {
+      id: '/coach'
+      path: '/coach'
+      fullPath: '/coach'
+      preLoaderRoute: typeof CoachRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rutina': {
+      id: '/rutina'
+      path: '/rutina'
+      fullPath: '/rutina'
+      preLoaderRoute: typeof RutinaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ejercicio/$id': {
+      id: '/ejercicio/$id'
+      path: '/ejercicio/$id'
+      fullPath: '/ejercicio/$id'
+      preLoaderRoute: typeof EjercicioIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BibliotecaRoute: BibliotecaRoute,
+  CoachRoute: CoachRoute,
+  OnboardingRoute: OnboardingRoute,
+  RutinaRoute: RutinaRoute,
+  EjercicioIdRoute: EjercicioIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
