@@ -117,4 +117,4 @@ export const levelOf = (v = 0): Level => (v > 2 ? "high" : v > 1 ? "mid" : v > 0
 export function bestKg(s: State, exId: string, beforeTs = Infinity) {
   return s.sets.filter((l) => l.exId === exId && l.ts < beforeTs).reduce((m, l) => Math.max(m, l.kg), 0);
 }
-export const fmt = (n: number) => Math.round(n).toLocaleString("es-ES");
+export const fmt = (n: number) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
