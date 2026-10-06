@@ -10,33 +10,141 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BibliotecaRouteImport } from './routes/biblioteca'
+import { Route as CoachRouteImport } from './routes/coach'
+import { Route as CompletadoRouteImport } from './routes/completado'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as ProgresoRouteImport } from './routes/progreso'
+import { Route as RutinaRouteImport } from './routes/rutina'
+import { Route as EjercicioIdRouteImport } from './routes/ejercicio.$id'
+import { Route as EntrenoDayRouteImport } from './routes/entreno.$day'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BibliotecaRoute = BibliotecaRouteImport.update({
+  id: '/biblioteca',
+  path: '/biblioteca',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoachRoute = CoachRouteImport.update({
+  id: '/coach',
+  path: '/coach',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompletadoRoute = CompletadoRouteImport.update({
+  id: '/completado',
+  path: '/completado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgresoRoute = ProgresoRouteImport.update({
+  id: '/progreso',
+  path: '/progreso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RutinaRoute = RutinaRouteImport.update({
+  id: '/rutina',
+  path: '/rutina',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EjercicioIdRoute = EjercicioIdRouteImport.update({
+  id: '/ejercicio/$id',
+  path: '/ejercicio/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EntrenoDayRoute = EntrenoDayRouteImport.update({
+  id: '/entreno/$day',
+  path: '/entreno/$day',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/biblioteca': typeof BibliotecaRoute
+  '/coach': typeof CoachRoute
+  '/completado': typeof CompletadoRoute
+  '/onboarding': typeof OnboardingRoute
+  '/progreso': typeof ProgresoRoute
+  '/rutina': typeof RutinaRoute
+  '/ejercicio/$id': typeof EjercicioIdRoute
+  '/entreno/$day': typeof EntrenoDayRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/biblioteca': typeof BibliotecaRoute
+  '/coach': typeof CoachRoute
+  '/completado': typeof CompletadoRoute
+  '/onboarding': typeof OnboardingRoute
+  '/progreso': typeof ProgresoRoute
+  '/rutina': typeof RutinaRoute
+  '/ejercicio/$id': typeof EjercicioIdRoute
+  '/entreno/$day': typeof EntrenoDayRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/biblioteca': typeof BibliotecaRoute
+  '/coach': typeof CoachRoute
+  '/completado': typeof CompletadoRoute
+  '/onboarding': typeof OnboardingRoute
+  '/progreso': typeof ProgresoRoute
+  '/rutina': typeof RutinaRoute
+  '/ejercicio/$id': typeof EjercicioIdRoute
+  '/entreno/$day': typeof EntrenoDayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/biblioteca'
+    | '/coach'
+    | '/completado'
+    | '/onboarding'
+    | '/progreso'
+    | '/rutina'
+    | '/ejercicio/$id'
+    | '/entreno/$day'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/biblioteca'
+    | '/coach'
+    | '/completado'
+    | '/onboarding'
+    | '/progreso'
+    | '/rutina'
+    | '/ejercicio/$id'
+    | '/entreno/$day'
+  id:
+    | '__root__'
+    | '/'
+    | '/biblioteca'
+    | '/coach'
+    | '/completado'
+    | '/onboarding'
+    | '/progreso'
+    | '/rutina'
+    | '/ejercicio/$id'
+    | '/entreno/$day'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BibliotecaRoute: typeof BibliotecaRoute
+  CoachRoute: typeof CoachRoute
+  CompletadoRoute: typeof CompletadoRoute
+  OnboardingRoute: typeof OnboardingRoute
+  ProgresoRoute: typeof ProgresoRoute
+  RutinaRoute: typeof RutinaRoute
+  EjercicioIdRoute: typeof EjercicioIdRoute
+  EntrenoDayRoute: typeof EntrenoDayRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +156,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/biblioteca': {
+      id: '/biblioteca'
+      path: '/biblioteca'
+      fullPath: '/biblioteca'
+      preLoaderRoute: typeof BibliotecaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coach': {
+      id: '/coach'
+      path: '/coach'
+      fullPath: '/coach'
+      preLoaderRoute: typeof CoachRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/completado': {
+      id: '/completado'
+      path: '/completado'
+      fullPath: '/completado'
+      preLoaderRoute: typeof CompletadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/progreso': {
+      id: '/progreso'
+      path: '/progreso'
+      fullPath: '/progreso'
+      preLoaderRoute: typeof ProgresoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rutina': {
+      id: '/rutina'
+      path: '/rutina'
+      fullPath: '/rutina'
+      preLoaderRoute: typeof RutinaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ejercicio/$id': {
+      id: '/ejercicio/$id'
+      path: '/ejercicio/$id'
+      fullPath: '/ejercicio/$id'
+      preLoaderRoute: typeof EjercicioIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/entreno/$day': {
+      id: '/entreno/$day'
+      path: '/entreno/$day'
+      fullPath: '/entreno/$day'
+      preLoaderRoute: typeof EntrenoDayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BibliotecaRoute: BibliotecaRoute,
+  CoachRoute: CoachRoute,
+  CompletadoRoute: CompletadoRoute,
+  OnboardingRoute: OnboardingRoute,
+  ProgresoRoute: ProgresoRoute,
+  RutinaRoute: RutinaRoute,
+  EjercicioIdRoute: EjercicioIdRoute,
+  EntrenoDayRoute: EntrenoDayRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
