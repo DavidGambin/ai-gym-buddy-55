@@ -3,7 +3,7 @@ import { z } from "zod";
 
 const Input = z.object({
   messages: z.array(z.object({ role: z.enum(["user", "assistant"]), content: z.string().max(4000) })).max(30),
-  context: z.string().max(40000),
+  context: z.string().max(100000),
 });
 
 const DAYS = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"];
