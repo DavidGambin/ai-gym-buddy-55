@@ -19,7 +19,7 @@ jobs:
         node-version: '24'
 
     - name: Instalar dependencias
-      run: npm install
+      run: npm install --no-package-lock
 
     - name: Compilar la app web (Vite)
       run: |
