@@ -27,7 +27,7 @@ jobs:
     - name: Inicializar Capacitor e iOS
       run: |
         npm install @capacitor/core @capacitor/cli @capacitor/ios
-        npx cap init FormaApp com.davidgambin.forma --web-dir dist
+        npx cap init FormaApp com.davidgambin.forma --web-dir build
         npx cap add ios
         npx cap sync ios
 
