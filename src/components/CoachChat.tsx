@@ -19,7 +19,8 @@ function buildContext() {
   return `Hoy es ${DAY_LABEL[todayKey()]} (${todayKey()}).\nPerfil: ${JSON.stringify(s.profile)}\nRUTINA:\n${routine}\nFATIGA ACTUAL: ${fat}\nCATÁLOGO (id|nombre|músculo|equipamiento):\n${cat}`;
 }
 
-function apply(actions: { name: string; args: Record<string, unknown> }[]) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function apply(actions: { name: string; args: any }[]) {
   const touched: string[] = []; let n = 0;
   const descr: string[] = [];
   mutateRoutine((r) => {
@@ -28,7 +29,7 @@ function apply(actions: { name: string; args: Record<string, unknown> }[]) {
       const list = r[day];
       if (name === "replace_exercise") {
         const i = list.findIndex((x) => x.exId === args.from_id); const to = String(args.to_id);
-        if (i >= 0 && EX_BY_ID[to]) { list[i] = { ...list[i], exId: to }; touched.push(to); n++; descr.push(`${DAY_LABEL[day]}: cambio de ejercicio`); }
+        if (i >= 0 && EX_BY_ID[to]) { list[i] = { ...list[i]!, exId: to }; touched.push(to); n++; descr.push(`${DAY_LABEL[day]}: cambio de ejercicio`); }
       } else if (name === "reorder_day") {
         const order = (args.order as string[]).filter((id) => list.some((x) => x.exId === id));
         const rest = list.filter((x) => !order.includes(x.exId));
@@ -64,8 +65,8 @@ export function CoachChat({ compact = false }: { compact?: boolean }) {
     const next = [...msgs, { role: "user" as const, content: q }];
     setMsgs(next); setText(""); setBusy(true);
     try {
-      const res = await ask({ data: { messages: next.slice(-12).map(({ role, content }) => ({ role, content })), context: buildContext() } });
-      const { n, touched } = res.actions.length ? apply(res.actions) : { n: 0, touched: [] };
+      const res: { text: string; actions: { name: string; args: string }[] } = await ask({ data: { messages: next.slice(-12).map(({ role, content }) => ({ role, content })), context: buildContext() } });
+      const { n, touched } = res.actions.length ? apply(res.actions.map((a) => ({ name: a.name, args: JSON.parse(a.args || "{}") }))) : { n: 0, touched: [] };
       setMsgs([...next, { role: "assistant", content: res.text, exIds: touched, changes: n }]);
     } catch (e) {
       setMsgs([...next, { role: "assistant", content: (e as Error).message || "No he podido responder." }]);
@@ -97,7 +98,7 @@ export function CoachChat({ compact = false }: { compact?: boolean }) {
             )}
             {m.exIds?.map((id) => (
               <Link key={id} to="/ejercicio/$id" params={{ id }} className="mt-2 block rounded-xl border border-border bg-card p-3">
-                <ExRow id={id} right={<span className="text-xs text-muted-foreground">{eqLabel(EX_BY_ID[id].eq)}</span>} />
+                <ExRow id={id} right={<span className="text-xs text-muted-foreground">{EX_BY_ID[id] ? eqLabel(EX_BY_ID[id].eq) : ""}</span>} />
               </Link>
             ))}
           </div>
