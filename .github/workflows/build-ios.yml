@@ -43,14 +43,9 @@ jobs:
     - name: Inicializar iOS y Capacitor
       run: |
         npm install @capacitor/core @capacitor/cli @capacitor/ios --legacy-peer-deps
+        rm -rf ios 
         npx cap add ios
         npx cap sync ios
-
-    - name: Instalar CocoaPods
-      # Solución 3: Sincronizar dependencias nativas
-      run: |
-        cd ios/App
-        pod install
 
     - name: Construir app en Xcode (Unsigned)
       # Solución 4: Flags para compilación sin firma en CI genérico
