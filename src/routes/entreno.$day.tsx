@@ -3,6 +3,7 @@ import { ArrowDown, ArrowRight, Check, ChevronLeft, Clock, Minus, Pause, Plus, R
 import { useEffect, useState } from "react";
 import { AnimatedNumber, ExRow } from "@/components/ui-forma";
 import { EX_BY_ID, GROUP_LABEL, alternativeFor, demand, eqLabel, muscleLabel } from "@/lib/exercises";
+import { SpotifyPlayer } from "@/components/SpotifyPlayer";
 import { DAYS, DAY_LABEL, getState, setState, type Day, type SetLog } from "@/lib/store";
 
 export const Route = createFileRoute("/entreno/$day")({
@@ -96,16 +97,8 @@ function Live() {
         <button onClick={finish} className="h-14 w-full rounded-2xl bg-primary text-lg font-bold text-primary-foreground glow">Terminar entreno</button>
       </div>
 
-      {/* Mini reproductor (maqueta) */}
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-md p-3" style={{ paddingBottom: "max(env(safe-area-inset-bottom), 12px)" }}>
-        <div className="rounded-2xl border border-border bg-navy p-3 shadow-2xl">
-          <div className="flex items-center gap-3">
-            <div className="h-11 w-11 shrink-0 rounded-lg" style={{ background: "linear-gradient(135deg, var(--coral), var(--violet))" }} />
-            <div className="min-w-0 flex-1"><p className="truncate text-sm font-bold">Power Hour</p><p className="truncate text-xs text-muted-foreground">Gym Beats · Forma Mix</p></div>
-            <SkipBack className="h-5 w-5" /><span className="grid h-9 w-9 place-items-center rounded-full bg-foreground text-background"><Pause className="h-4 w-4 fill-current" /></span><SkipForward className="h-5 w-5" />
-          </div>
-          <div className="mt-2 h-1 rounded-full bg-background/50"><div className="h-full w-2/5 rounded-full bg-primary" /></div>
-        </div>
+        <SpotifyPlayer compact />
       </div>
 
       {busy && (
