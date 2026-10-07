@@ -42,12 +42,12 @@ export const groupOf = (e: Exercise): Group => (Object.keys(GROUP_TARGETS) as Gr
 export const TARGET_LABEL: Record<string, string> = {
   pectorals: "Pecho", delts: "Hombros", biceps: "Bíceps", triceps: "Tríceps", "upper back": "Espalda alta", lats: "Dorsal",
   traps: "Trapecio", quads: "Cuádriceps", glutes: "Glúteos", hamstrings: "Isquios", calves: "Gemelos", abs: "Abdomen",
-  forearms: "Antebrazos", spine: "Lumbar",
+  forearms: "Antebrazos", spine: "Lumbar", "cardiovascular system": "Cardio", adductors: "Aductores", abductors: "Abductores", "serratus anterior": "Serrato", "levator scapulae": "Elevador de la escápula",
 };
 export const muscleLabel = (m: string) => TARGET_LABEL[m] ?? (toMuscle(m) ? MUSCLE_LABEL[toMuscle(m)!] : m);
 export const EQ_LABEL: Record<string, string> = {
   barbell: "Barra", dumbbell: "Mancuernas", cable: "Polea", "leverage machine": "Máquina", "body weight": "Peso corporal",
-  "smith machine": "Multipower", "ez barbell": "Barra Z", "sled machine": "Prensa", band: "Banda", kettlebell: "Kettlebell",
+  "smith machine": "Multipower", "ez barbell": "Barra Z", "sled machine": "Prensa", band: "Banda", kettlebell: "Kettlebell", weighted: "Con lastre", "stability ball": "Fitball", assisted: "Asistida", "medicine ball": "Balón medicinal", rope: "Cuerda", roller: "Rodillo", "resistance band": "Banda elástica", "bosu ball": "Bosu", "olympic barbell": "Barra olímpica", "wheel roller": "Rueda abdominal", "upper body ergometer": "Ergómetro de brazos", "skierg machine": "SkiErg", hammer: "Martillo", "stationary bike": "Bici estática", tire: "Neumático", "trap bar": "Barra hexagonal", "elliptical machine": "Elíptica", "stepmill machine": "Escaladora",
 };
 export const eqLabel = (e: string) => EQ_LABEL[e] ?? e;
 
