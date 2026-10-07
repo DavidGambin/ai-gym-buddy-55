@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { ArrowDown, ArrowRight, Check, ChevronLeft, Clock, Minus, Pause, Plus, Repeat, SkipBack, SkipForward, Users } from "lucide-react";
+import { ArrowDown, ArrowRight, Check, ChevronLeft, Clock, Minus, Plus, Repeat, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AnimatedNumber, ExRow } from "@/components/ui-forma";
 import { EX_BY_ID, GROUP_LABEL, alternativeFor, demand, eqLabel, muscleLabel } from "@/lib/exercises";
