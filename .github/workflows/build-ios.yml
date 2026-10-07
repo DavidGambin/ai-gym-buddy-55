@@ -1,52 +1,60 @@
 name: Build iOS IPA (Unsigned)
 
 on:
+  push:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: macos-latest
+
     steps:
-      - uses: actions/checkout@v4
+    - name: Checkout código
+      uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
+    - name: Configurar Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
 
-      - name: Instalar dependencias y compilar la web
-        run: |
-          npm install
-          npm run build
+    - name: Instalar dependencias
+      run: npm install
 
-      - name: Capacitor iOS
-        run: |
-          npm install @capacitor/core@7 @capacitor/cli@7 @capacitor/ios@7
-          npx cap init FormaApp com.davidgambin.forma --web-dir dist
-          npx cap add ios
-          npx cap sync ios
-          ls ios/App
+    - name: Compilar la app web (Vite)
+      run: npm run build
+      echo "=== CARPETAS DISPONIBLES ==="
+      ls -la
 
-      - name: Compilar sin firmar
-        run: |
-          cd ios/App
-          xcodebuild -workspace App.xcworkspace \
-            -scheme App \
-            -configuration Release \
-            -sdk iphoneos \
-            -destination 'generic/platform=iOS' \
-            -derivedDataPath derivedData \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
+    - name: Inicializar Capacitor e iOS
+      run: |
+        npm install @capacitor/core @capacitor/cli @capacitor/ios
+        # Dejamos 'dist' temporalmente hasta ver el nombre real
+        npx cap init FormaApp com.davidgambin.forma --web-dir dist
+        npx cap add ios
+        npx cap sync ios
 
-      - name: Empaquetar .ipa
-        run: |
-          cd ios/App/derivedData/Build/Products/Release-iphoneos
-          mkdir Payload
-          mv App.app Payload/
-          zip -r FormaApp.ipa Payload
+    - name: Construir app en Xcode (Unsigned)
+      run: |
+        cd ios/App
+        xcodebuild -workspace App.xcworkspace \
+          -scheme App \
+          -configuration Release \
+          -sdk iphoneos \
+          -derivedDataPath derivedData \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: FormaApp-IPA
-          path: ios/App/derivedData/Build/Products/Release-iphoneos/FormaApp.ipa
+    - name: Empaquetar a .ipa
+      run: |
+        cd ios/App/derivedData/Build/Products/Release-iphoneos
+        mkdir Payload
+        mv App.app Payload/
+        zip -r FormaApp.ipa Payload
+
+    - name: Subir .ipa para descargar
+      uses: actions/upload-artifact@v4
+      with:
+        name: FormaApp-IPA
+        path: ios/App/derivedData/Build/Products/Release-iphoneos/FormaApp.ipa
