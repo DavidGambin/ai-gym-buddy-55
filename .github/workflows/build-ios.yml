@@ -42,16 +42,21 @@ jobs:
 
     - name: Inicializar iOS y Capacitor
       run: |
-        npm install @capacitor/core @capacitor/cli @capacitor/ios --legacy-peer-deps
-        rm -rf ios 
+        npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/ios@6 --legacy-peer-deps
+        rm -rf ios
         npx cap add ios
         npx cap sync ios
+        ls ios/App
 
     - name: Construir app en Xcode (Unsigned)
-      # Solución 4: Flags para compilación sin firma en CI genérico
       run: |
         cd ios/App
-        xcodebuild -workspace App.xcworkspace \
+        if [ -d App.xcworkspace ]; then
+          TARGET="-workspace App.xcworkspace"
+        else
+          TARGET="-project App.xcodeproj"
+        fi
+        xcodebuild $TARGET \
           -scheme App \
           -configuration Release \
           -destination 'generic/platform=iOS' \
