@@ -12,12 +12,32 @@ const CHAT_KEY = "forma.chat";
 const LV: Record<string, string> = { high: "alta", mid: "media", low: "baja" };
 
 function buildContext() {
-  const s = getState(); const f = computeFatigue(s);
-  const routine = DAYS.map((d) => `${DAY_LABEL[d]} (${d}) [${s.plan[d].join(", ") || "descanso"}]: ${s.routine[d].map((r) => `${r.exId} ${EX_BY_ID[r.exId]?.n} x${r.sets.length}`).join("; ") || "—"}`).join("\n");
-  const fat = (Object.keys(f) as Muscle[]).filter((m) => levelOf(f[m])).map((m) => `${MUSCLE_LABEL[m]}: ${LV[levelOf(f[m])!]} (${f[m].toFixed(1)})`).join(", ") || "ninguna";
-  const cat = EXERCISES.map((e) => `${e.id}|${e.n}|${e.t}|${e.eq}`).join("\n");
-  return `Hoy es ${DAY_LABEL[todayKey()]} (${todayKey()}).\nPerfil: ${JSON.stringify(s.profile)}\nRUTINA:\n${routine}\nFATIGA ACTUAL: ${fat}\nCATÁLOGO (id|nombre|músculo|equipamiento):\n${cat}`;
+  const s = getState();
+  const f = computeFatigue(s);
+  const routine = DAYS.map(
+    (d) =>
+      `${DAY_LABEL[d]} (${d}) [${s.plan[d].join(", ") || "descanso"}]: ${s.routine[d].map((r) => `${r.exId} ${EX_BY_ID[r.exId]?.n} x${r.sets.length}`).join("; ") || "—"}`
+  ).join("\n");
+  const fat =
+    (Object.keys(f) as Muscle[])
+      .filter((m) => levelOf(f[m]))
+      .map((m) => `${MUSCLE_LABEL[m]}: ${LV[levelOf(f[m])!]} (${f[m].toFixed(1)})`)
+      .join(", ") || "ninguna";
+
+  // Identificar IDs de la rutina actual
+  const routineIds = new Set(DAYS.flatMap((d) => s.routine[d].map((r) => r.exId)));
+  const todayMuscles = new Set(s.plan[todayKey()] || []);
+
+  // Catálogo optimizado: ejercicios en la rutina + ejercicios de los grupos de hoy
+  const relevant = EXERCISES.filter(
+    (e) => routineIds.has(e.id) || todayMuscles.has(e.t)
+  ).slice(0, 80);
+
+  const cat = relevant.map((e) => `${e.id}|${e.n}|${e.t}|${e.eq}`).join("\n");
+
+  return `Hoy es ${DAY_LABEL[todayKey()]} (${todayKey()}).\nPerfil: ${JSON.stringify(s.profile)}\nRUTINA:\n${routine}\nFATIGA ACTUAL: ${fat}\nCATÁLOGO DISPONIBLE (id|nombre|músculo|equipamiento):\n${cat}`;
 }
+
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function apply(actions: { name: string; args: any }[]) {
