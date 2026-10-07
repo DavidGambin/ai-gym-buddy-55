@@ -15,6 +15,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { BottomNav } from "@/components/ui-forma";
 import { CoachFab } from "@/components/CoachChat";
+import { AuthGate } from "@/components/AuthGate";
 
 function NotFoundComponent() {
   return (
@@ -99,10 +100,12 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="mx-auto min-h-screen max-w-md bg-background">
-        <Outlet />
+        <AuthGate>
+          <Outlet />
+          {fab && <CoachFab />}
+          <BottomNav />
+        </AuthGate>
       </div>
-      {fab && <CoachFab />}
-      <BottomNav />
     </QueryClientProvider>
   );
 }
