@@ -1,60 +1,16 @@
-name: Build iOS IPA (Unsigned)
-
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: macos-latest
-
-    steps:
-    - name: Checkout código
-      uses: actions/checkout@v4
-
-    - name: Configurar Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '24'
-
-    - name: Instalar dependencias
-      run: npm install --no-package-lock
-
-    - name: Compilar la app web (Vite)
+- name: Preparar Capacitor para SSR (App en la nube)
       run: |
-        npm run build
-        echo "=== CARPETAS DISPONIBLES ==="
-        ls -la
-
-    - name: Inicializar Capacitor e iOS
-      run: |
-        npm install @capacitor/core @capacitor/cli @capacitor/ios
-        npx cap init FormaApp com.davidgambin.forma --web-dir .output/public
-        npx cap add ios
-        npx cap sync ios
-
-    - name: Construir app en Xcode (Unsigned)
-      run: |
-        cd ios/App
-        xcodebuild -workspace App.xcworkspace \
-          -scheme App \
-          -configuration Release \
-          -sdk iphoneos \
-          -derivedDataPath derivedData \
-          CODE_SIGN_IDENTITY="" \
-          CODE_SIGNING_REQUIRED=NO \
-          CODE_SIGNING_ALLOWED=NO
-
-    - name: Empaquetar a .ipa
-      run: |
-        cd ios/App/derivedData/Build/Products/Release-iphoneos
-        mkdir Payload
-        mv App.app Payload/
-        zip -r FormaApp.ipa Payload
-
-    - name: Subir .ipa para descargar
-      uses: actions/upload-artifact@v4
-      with:
-        name: FormaApp-IPA
-        path: ios/App/derivedData/Build/Products/Release-iphoneos/FormaApp.ipa
+        mkdir -p dummy_web_dir
+        echo "<!DOCTYPE html><html><head><title>FormaApp</title></head><body></body></html>" > dummy_web_dir/index.html
+        
+        cat <<EOF > capacitor.config.json
+        {
+          "appId": "com.davidgambin.forma",
+          "appName": "FormaApp",
+          "webDir": "dummy_web_dir",
+          "server": {
+            "url": "https://ai-gym-buddy-55.lovable.app/", 
+            "cleartext": true
+          }
+        }
+        EOF
