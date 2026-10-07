@@ -28,7 +28,7 @@ Si hay molestias o lesión, propone alternativas seguras y recuerda consultar a 
 
 type Item = { type: string; name?: string; arguments?: string; call_id?: string; content?: { type: string; text?: string }[] };
 
-async function respond(input: unknown[], key: string, runId?: string): Promise<{ output: Item[]; runId?: string }> {
+async function respond(input: unknown[], key: string, runId?: string): Promise<{ output: Item[]; runId?: string | undefined }> {
   const headers: Record<string, string> = { "Content-Type": "application/json", "Lovable-API-Key": key, "X-Lovable-AIG-SDK": "fetch" };
   if (runId) headers["X-Lovable-AIG-Run-ID"] = runId;
   const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
@@ -61,7 +61,7 @@ const textOf = (out: Item[]) => out.filter((o) => o.type === "message").flatMap(
 export const askCoach = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => Input.parse(d))
   .handler(async ({ data }) => {
-    const key = process.env.LOVABLE_API_KEY;
+    const key = process.env["LOVABLE_API_KEY"];
     if (!key) throw new Error("LOVABLE_API_KEY missing");
     const input: unknown[] = [
       { role: "developer", content: [{ type: "input_text", text: "CONTEXTO DEL USUARIO:\n" + data.context }] },
@@ -69,7 +69,7 @@ export const askCoach = createServerFn({ method: "POST" })
     ];
     const first = await respond(input, key);
     const calls = first.output.filter((o) => o.type === "function_call");
-    const actions = calls.map((c) => { let args: Record<string, unknown> = {}; try { args = JSON.parse(c.arguments || "{}"); } catch { /* */ } return { name: c.name ?? "", args }; });
+    const actions = calls.map((c) => { return { name: c.name ?? "", args: c.arguments || "{}" }; });
     let text = textOf(first.output);
     if (calls.length) {
       const second = await respond([...input, ...first.output, ...calls.map((c) => ({ type: "function_call_output", call_id: c.call_id, output: "ok, aplicado" }))], key, first.runId);
