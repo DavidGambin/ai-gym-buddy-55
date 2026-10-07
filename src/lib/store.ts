@@ -43,41 +43,51 @@ export const defaultSets = (): SetT[] => [{ kg: 20, reps: 10 }, { kg: 20, reps: 
 export const buildDay = (groups: Group[]): RoutineEx[] => suggestForGroups(groups).map((exId) => ({ exId, sets: defaultSets() }));
 const emptyRoutine = () => Object.fromEntries(DAYS.map((d) => [d, []])) as unknown as Record<Day, RoutineEx[]>;
 
-function sample(): State {
-  const routine = Object.fromEntries(DAYS.map((d) => [d, buildDay(DEFAULT_PLAN[d])])) as Record<Day, RoutineEx[]>;
-  // Datos de ejemplo: entreno de ayer y de hace 3 días
-  const now = Date.now();
-  const sets: SetLog[] = [];
-  const workouts: Workout[] = [];
-  const mk = (day: Day, hoursAgo: number, base: number) => {
-    const id = "w" + hoursAgo; const ts = now - hoursAgo * 3600e3; let vol = 0;
-    routine[day].forEach((r, i) => r.sets.forEach(() => { const kg = base + i * 2; sets.push({ exId: r.exId, kg, reps: 10, ts, workoutId: id }); vol += kg * 10; }));
-    workouts.push({ id, day, ts, durationSec: 3300, volume: vol, exIds: routine[day].map((r) => r.exId) });
-  };
-  mk("jueves", 120, 25); mk("martes", 72, 30); mk("lunes", 20, 35);
-  return { loaded: true, onboarded: false, profile: { weight: 75, height: 178, chest: 100, waist: 82, arm: 35 }, plan: DEFAULT_PLAN, routine, workouts, sets, aiChanges: [], snapshots: [], recoveryHours: {} };
+/** Estado inicial de una cuenta nueva: sin entrenos, sin récords. */
+function fresh(): State {
+  return { loaded: true, onboarded: false, profile: { weight: 75, height: 178, chest: 100, waist: 82, arm: 35 }, plan: DEFAULT_PLAN, routine: emptyRoutine(), workouts: [], sets: [], aiChanges: [], snapshots: [], recoveryHours: {} };
 }
 
-const KEY = "forma.v1";
-const SERVER: State = { ...sample(), loaded: false, routine: emptyRoutine(), workouts: [], sets: [] };
+const SERVER: State = { ...fresh(), loaded: false };
 let state: State = SERVER;
+let userId: string | null = null;
+let saveTimer: ReturnType<typeof setTimeout> | undefined;
 const subs = new Set<() => void>();
+const emit = () => subs.forEach((f) => f());
 
-function init() {
-  if (typeof window === "undefined" || state.loaded) return;
-  try { const s = localStorage.getItem(KEY); state = s ? { ...sample(), ...JSON.parse(s), loaded: true } : sample(); } catch { state = sample(); }
+async function persist() {
+  if (!userId) return;
+  const { supabase } = await import("@/integrations/supabase/client");
+  const { loaded: _l, snapshots: _s, ...data } = state;
+  const { error } = await supabase.from("user_data").upsert({ user_id: userId, data: data as never, updated_at: new Date().toISOString() });
+  if (error) console.error("No se pudo guardar", error);
 }
+function schedulePersist() { clearTimeout(saveTimer); saveTimer = setTimeout(persist, 600); }
+
+/** Carga los datos de la cuenta desde la base de datos. */
+export async function loadUser(id: string) {
+  if (userId === id && state.loaded) return;
+  userId = id; state = SERVER; emit();
+  const { supabase } = await import("@/integrations/supabase/client");
+  const { data, error } = await supabase.from("user_data").select("data").eq("user_id", id).maybeSingle();
+  if (userId !== id) return;
+  if (error) console.error(error);
+  state = { ...fresh(), ...((data?.data as Partial<State>) ?? {}), snapshots: [], loaded: true };
+  if (!data) void persist();
+  emit();
+}
+export function clearUser() { clearTimeout(saveTimer); userId = null; state = SERVER; emit(); }
+
 export function setState(fn: (s: State) => Partial<State>) {
-  init();
   state = { ...state, ...fn(state) };
-  try { const { loaded: _l, ...rest } = state; localStorage.setItem(KEY, JSON.stringify(rest)); } catch { /* ignore */ }
-  subs.forEach((f) => f());
+  schedulePersist();
+  emit();
 }
-export function getState() { init(); return state; }
+export function getState() { return state; }
 export function useStore<T>(sel: (s: State) => T): T {
   return useSyncExternalStore(
     (cb) => { subs.add(cb); return () => subs.delete(cb); },
-    () => sel(getState()),
+    () => sel(state),
     () => sel(SERVER),
   );
 }
@@ -94,7 +104,7 @@ export function undoAi() {
   setState((s) => s.snapshots.length ? { routine: s.snapshots[s.snapshots.length - 1], snapshots: s.snapshots.slice(0, -1), aiChanges: [...s.aiChanges, { ts: Date.now(), summary: "Deshacer" }] } : {});
 }
 
-export function resetAll() { localStorage.removeItem(KEY); state = sample(); subs.forEach((f) => f()); }
+export function resetAll() { setState(() => fresh()); }
 
 /* ---------- Fatigue ---------- */
 export function computeFatigue(s: State, at = Date.now()): Record<Muscle, number> {
