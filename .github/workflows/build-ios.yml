@@ -1,4 +1,28 @@
-- name: Preparar Capacitor para SSR (App en la nube)
+name: Build iOS IPA (Unsigned)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14 # Usamos macos-14 para asegurar estabilidad con Xcode moderno
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+
+    - name: Configurar Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22' # Solución 1: Versión estable y soportada
+
+    - name: Instalar dependencias web
+      # Solución 1: Ignorar conflictos de dependencias de React 19/Recharts
+      run: npm install --legacy-peer-deps
+
+    - name: Preparar Capacitor para SSR (App en la nube)
       run: |
         mkdir -p dummy_web_dir
         echo "<!DOCTYPE html><html><head><title>FormaApp</title></head><body></body></html>" > dummy_web_dir/index.html
@@ -14,3 +38,44 @@
           }
         }
         EOF
+      
+
+    - name: Inicializar iOS y Capacitor
+      run: |
+        npm install @capacitor/core @capacitor/cli @capacitor/ios --legacy-peer-deps
+        npx cap add ios
+        npx cap sync ios
+
+    - name: Instalar CocoaPods
+      # Solución 3: Sincronizar dependencias nativas
+      run: |
+        cd ios/App
+        pod install
+
+    - name: Construir app en Xcode (Unsigned)
+      # Solución 4: Flags para compilación sin firma en CI genérico
+      run: |
+        cd ios/App
+        xcodebuild -workspace App.xcworkspace \
+          -scheme App \
+          -configuration Release \
+          -destination 'generic/platform=iOS' \
+          -sdk iphoneos \
+          -derivedDataPath derivedData \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO \
+          DEVELOPMENT_TEAM=""
+
+    - name: Empaquetar a .ipa
+      run: |
+        cd ios/App/derivedData/Build/Products/Release-iphoneos
+        mkdir Payload
+        mv App.app Payload/
+        zip -r FormaApp.ipa Payload
+
+    - name: Subir .ipa para descargar
+      uses: actions/upload-artifact@v4
+      with:
+        name: FormaApp-IPA
+        path: ios/App/derivedData/Build/Products/Release-iphoneos/FormaApp.ipa
