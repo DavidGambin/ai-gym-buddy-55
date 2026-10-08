@@ -13,7 +13,7 @@ export const todayKey = (): Day => DAYS[(new Date().getDay() + 6) % 7];
 export type SetT = { kg: number; reps: number };
 export type RoutineEx = { exId: string; sets: SetT[] };
 export type SetLog = { exId: string; kg: number; reps: number; ts: number; workoutId: string };
-export type Workout = { id: string; day: Day; ts: number; durationSec: number; volume: number; exIds: string[] };
+export type Workout = { id: string; day: Day; ts: number; durationSec: number; volume: number; exIds: string[]; photo?: string; note?: string };
 export type AiChange = { ts: number; summary: string };
 export type Profile = { weight: number; height: number; chest: number; waist: number; arm: number };
 

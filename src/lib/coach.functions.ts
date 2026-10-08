@@ -9,8 +9,8 @@ const Input = z.object({
 const DAYS = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"];
 const day = { type: "string", enum: DAYS };
 const fn = (name: string, description: string, properties: Record<string, unknown>) => ({
-  type: "function", name, description, strict: true,
-  parameters: { type: "object", properties, required: Object.keys(properties), additionalProperties: false },
+  type: "function",
+  function: { name, description, parameters: { type: "object", properties, required: Object.keys(properties) } },
 });
 const tools = [
   fn("replace_exercise", "Sustituye un ejercicio de un día por otro del catálogo.", { day, from_id: { type: "string" }, to_id: { type: "string" } }),
@@ -26,54 +26,38 @@ Puedes modificar la rutina del usuario usando las herramientas; usa SOLO ids del
 Ten en cuenta el mapa de fatiga: si un músculo está en "alta" o "media", recomienda evitarlo hoy y sugiere grupos frescos.
 Si hay molestias o lesión, propone alternativas seguras y recuerda consultar a un profesional si persiste el dolor.`;
 
-type Item = { type: string; name?: string; arguments?: string; call_id?: string; content?: { type: string; text?: string }[] };
+type Call = { id: string; type: "function"; function: { name: string; arguments: string } };
+type ChatMsg = { role: string; content: string | null; tool_calls?: Call[]; tool_call_id?: string };
 
-async function respond(input: unknown[], key: string, runId?: string): Promise<{ output: Item[]; runId?: string | undefined }> {
-  const headers: Record<string, string> = { "Content-Type": "application/json", "Lovable-API-Key": key, "X-Lovable-AIG-SDK": "fetch" };
-  if (runId) headers["X-Lovable-AIG-Run-ID"] = runId;
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
-    method: "POST", headers,
-    body: JSON.stringify({
-      model: "openai/gpt-6-astra", instructions: SYSTEM, input, tools, stream: true, store: false,
-      reasoning: { effort: "low", summary: "auto" }, include: ["reasoning.encrypted_content"],
-    }),
+async function chat(messages: ChatMsg[], key: string, withTools: boolean) {
+  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify({ model: "google/gemini-3-flash-preview", messages, ...(withTools ? { tools } : {}) }),
   });
   if (res.status === 429) throw new Error("Demasiadas peticiones, espera un momento.");
   if (res.status === 402) throw new Error("Sin créditos de IA disponibles.");
-  if (!res.ok || !res.body) { console.error("coach", res.status, await res.text().catch(() => "")); throw new Error("El coach no está disponible ahora mismo."); }
-  const rid = res.headers.get("X-Lovable-AIG-Run-ID") ?? runId;
-  const reader = res.body.getReader(); const dec = new TextDecoder(); let buf = ""; let output: Item[] = [];
-  for (;;) {
-    const { done, value } = await reader.read(); if (done) break;
-    buf += dec.decode(value, { stream: true });
-    let i;
-    while ((i = buf.indexOf("\n")) >= 0) {
-      const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
-      if (!line.startsWith("data:")) continue;
-      const p = line.slice(5).trim(); if (!p || p === "[DONE]") continue;
-      try { const ev = JSON.parse(p); if (ev.type === "response.completed") output = ev.response?.output ?? []; if (ev.type === "response.failed" || ev.type === "error") throw new Error("fail"); } catch (e) { if ((e as Error).message === "fail") throw new Error("El coach no pudo responder."); }
-    }
-  }
-  return { output, runId: rid };
+  if (!res.ok) { console.error("coach", res.status, await res.text().catch(() => "")); throw new Error("El coach no está disponible ahora mismo."); }
+  const j = await res.json();
+  return j.choices?.[0]?.message as ChatMsg;
 }
-const textOf = (out: Item[]) => out.filter((o) => o.type === "message").flatMap((o) => o.content ?? []).map((c) => c.text ?? "").join("").trim();
 
 export const askCoach = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => Input.parse(d))
   .handler(async ({ data }) => {
     const key = process.env["LOVABLE_API_KEY"];
     if (!key) throw new Error("LOVABLE_API_KEY missing");
-    const input: unknown[] = [
-      { role: "developer", content: [{ type: "input_text", text: "CONTEXTO DEL USUARIO:\n" + data.context }] },
-      ...data.messages.map((m) => ({ role: m.role, content: [{ type: m.role === "user" ? "input_text" : "output_text", text: m.content }] })),
+    const messages: ChatMsg[] = [
+      { role: "system", content: SYSTEM + "\n\nCONTEXTO DEL USUARIO:\n" + data.context },
+      ...data.messages.map((m) => ({ role: m.role, content: m.content })),
     ];
-    const first = await respond(input, key);
-    const calls = first.output.filter((o) => o.type === "function_call");
-    const actions = calls.map((c) => { return { name: c.name ?? "", args: c.arguments || "{}" }; });
-    let text = textOf(first.output);
+    const first = await chat(messages, key, true);
+    const calls = first?.tool_calls ?? [];
+    const actions = calls.map((c) => ({ name: c.function.name, args: c.function.arguments || "{}" }));
+    let text = first?.content ?? "";
     if (calls.length) {
-      const second = await respond([...input, ...first.output, ...calls.map((c) => ({ type: "function_call_output", call_id: c.call_id, output: "ok, aplicado" }))], key, first.runId);
-      text = textOf(second.output) || text || "Listo, he actualizado tu rutina.";
+      const second = await chat([...messages, { role: "assistant", content: first.content ?? "", tool_calls: calls }, ...calls.map((c) => ({ role: "tool", tool_call_id: c.id, content: "ok, aplicado" }))], key, false);
+      text = second?.content || text || "Listo, he actualizado tu rutina.";
     }
     return { text: text || "¿En qué te ayudo?", actions };
   });
