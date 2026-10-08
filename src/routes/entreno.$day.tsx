@@ -1,10 +1,14 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { ArrowDown, ArrowRight, Check, ChevronLeft, Clock, Minus, Plus, Repeat, Users } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUp, Check, ChevronLeft, Clock, Minus, Plus, Repeat, Trash2, Users } from "lucide-react";
+import { GroupedList, SearchFilters } from "@/components/ExercisePicker";
+import type { Group } from "@/lib/exercises";
 import { useEffect, useState } from "react";
 import { AnimatedNumber, ExRow } from "@/components/ui-forma";
 import { EX_BY_ID, GROUP_LABEL, alternativeFor, demand, eqLabel, muscleLabel } from "@/lib/exercises";
 import { SpotifyPlayer } from "@/components/SpotifyPlayer";
-import { DAYS, DAY_LABEL, getState, setState, type Day, type SetLog } from "@/lib/store";
+import { DAYS, DAY_LABEL, defaultSets, getState, setState, type Day, type SetLog } from "@/lib/store";
+
+const LIVE_KEY = (d: string) => `forma.live.${d}`;
 
 export const Route = createFileRoute("/entreno/$day")({
   loader: ({ params }) => { if (!DAYS.includes(params.day as Day)) throw notFound(); return { day: params.day as Day }; },
@@ -21,12 +25,22 @@ function Live() {
   const { day } = Route.useLoaderData();
   const nav = useNavigate();
   const [items, setItems] = useState<LEx[] | null>(null);
-  const [start] = useState(() => Date.now());
+  const [start, setStart] = useState(() => Date.now());
   const [now, setNow] = useState(start);
+  const [adding, setAdding] = useState(false);
+  const [aq, setAq] = useState(""); const [ag, setAg] = useState<Group[]>(() => getState().plan[day]);
   const [busy, setBusy] = useState<{ from: string[]; to: string[]; ex: string } | null>(null);
   const [swap, setSwap] = useState<{ i: number; to: string } | null>(null);
 
-  useEffect(() => { setItems(getState().routine[day].map((r) => ({ exId: r.exId, sets: r.sets.map((s) => ({ ...s, done: false })) }))); }, [day]);
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(LIVE_KEY(day)) || "null") as { start: number; items: LEx[] } | null;
+      if (saved && Date.now() - saved.start < 12 * 3600e3) { setStart(saved.start); setItems(saved.items); return; }
+    } catch { /* */ }
+    const st = Date.now(); setStart(st);
+    setItems(getState().routine[day].map((r) => ({ exId: r.exId, sets: r.sets.map((s) => ({ ...s, done: false })) })));
+  }, [day]);
+  useEffect(() => { if (items) localStorage.setItem(LIVE_KEY(day), JSON.stringify({ start, items })); }, [items, start, day]);
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, []);
   if (!items) return <div className="min-h-screen" />;
 
@@ -34,6 +48,10 @@ function Live() {
   const sec = Math.floor((now - start) / 1000);
   const time = `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
   const upd = (i: number, f: (e: LEx) => LEx) => setItems(items.map((e, k) => (k === i ? f(structuredClone(e)) : e)));
+
+  function move(i: number, d: number) {
+    const n = [...items!]; const [x] = n.splice(i, 1); n.splice(i + d, 0, x!); setItems(n);
+  }
 
   function occupied(i: number) {
     const ids = items!.map((e) => e.exId);
@@ -52,6 +70,7 @@ function Live() {
       workouts: [...s.workouts, { id, day, ts, durationSec: sec, volume: vol, exIds: [...new Set(logs.map((l) => l.exId))] }],
       routine: { ...s.routine, [day]: items!.map((e) => ({ exId: e.exId, sets: e.sets.map(({ kg, reps }) => ({ kg, reps })) })) },
     }));
+    localStorage.removeItem(LIVE_KEY(day));
     nav({ to: "/completado", search: { w: id } });
   }
 
@@ -73,7 +92,14 @@ function Live() {
       <div className="space-y-4 px-4 pt-4">
         {items.map((e, i) => (
           <div key={e.exId + i} className="rounded-2xl border border-border bg-card p-4">
-            <Link to="/ejercicio/$id" params={{ id: e.exId }}><ExRow id={e.exId} /></Link>
+            <div className="flex items-start gap-2">
+              <Link to="/ejercicio/$id" params={{ id: e.exId }} className="min-w-0 flex-1"><ExRow id={e.exId} /></Link>
+              <div className="flex shrink-0 gap-1">
+                <button disabled={i === 0} onClick={() => move(i, -1)} className="grid h-8 w-8 place-items-center rounded-full bg-background disabled:opacity-30" aria-label="Subir"><ArrowUp className="h-4 w-4" /></button>
+                <button disabled={i === items.length - 1} onClick={() => move(i, 1)} className="grid h-8 w-8 place-items-center rounded-full bg-background disabled:opacity-30" aria-label="Bajar"><ArrowDown className="h-4 w-4" /></button>
+                <button onClick={() => { if (confirm("¿Quitar este ejercicio del entreno?")) setItems(items.filter((_, k) => k !== i)); }} className="grid h-8 w-8 place-items-center rounded-full bg-destructive/20 text-destructive" aria-label="Quitar ejercicio"><Trash2 className="h-4 w-4" /></button>
+              </div>
+            </div>
             <div className="mt-4 grid grid-cols-[32px_28px_1fr_16px_1fr_44px] items-center gap-2 text-[11px] font-semibold uppercase text-muted-foreground">
               <span /><span>Serie</span><span className="text-center">kg</span><span /><span className="text-center">Reps</span><span />
             </div>
@@ -94,6 +120,7 @@ function Live() {
             </div>
           </div>
         ))}
+        <button onClick={() => setAdding(true)} className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-primary/60 font-semibold text-primary"><Plus className="h-4 w-4" />Añadir ejercicio</button>
         <button onClick={finish} className="h-14 w-full rounded-2xl bg-primary text-lg font-bold text-primary-foreground glow">Terminar entreno</button>
       </div>
 
@@ -117,6 +144,16 @@ function Live() {
             })}
           </div>
           <button onClick={() => { setItems(busy.to.map((id) => items.find((x) => x.exId === id)!)); setBusy(null); }} className="mt-4 h-13 w-full rounded-2xl bg-primary py-3.5 font-bold text-primary-foreground">Aceptar orden</button>
+        </Sheet>
+      )}
+      {adding && (
+        <Sheet onClose={() => setAdding(false)} title="Añadir ejercicio">
+          <SearchFilters q={aq} setQ={setAq} groups={ag} setGroups={setAg} />
+          <div className="max-h-[55vh] overflow-y-auto">
+            <GroupedList q={aq} groups={ag} render={(x) => (
+              <button key={x.id} onClick={() => { setItems([...items, { exId: x.id, sets: defaultSets().map((s) => ({ ...s, done: false })) }]); setAdding(false); setAq(""); }} className="block w-full rounded-xl bg-background p-2.5 text-left"><ExRow id={x.id} /></button>
+            )} />
+          </div>
         </Sheet>
       )}
       {swap && (
