@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowUp, Loader2, RotateCcw, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { askCoach } from "@/lib/coach.functions";
-import { EXERCISES, EX_BY_ID, MUSCLE_LABEL, eqLabel, type Muscle } from "@/lib/exercises";
+import { EXERCISES, EX_BY_ID, GROUP_TARGETS, MUSCLE_LABEL, eqLabel, type Muscle } from "@/lib/exercises";
 import { DAYS, DAY_LABEL, computeFatigue, defaultSets, getState, levelOf, mutateRoutine, todayKey, undoAi, useStore, type Day } from "@/lib/store";
 import { ExRow } from "./ui-forma";
 
@@ -26,12 +26,12 @@ function buildContext() {
 
   // Identificar IDs de la rutina actual
   const routineIds = new Set(DAYS.flatMap((d) => s.routine[d].map((r) => r.exId)));
-  const todayMuscles = new Set(s.plan[todayKey()] || []);
+  const todayTargets = new Set((s.plan[todayKey()] || []).flatMap((g) => GROUP_TARGETS[g]));
 
   // Catálogo optimizado: ejercicios en la rutina + ejercicios de los grupos de hoy
   const relevant = EXERCISES.filter(
-    (e) => routineIds.has(e.id) || todayMuscles.has(e.t)
-  ).slice(0, 80);
+    (e) => routineIds.has(e.id) || todayTargets.has(e.t)
+  ).slice(0, 150);
 
   const cat = relevant.map((e) => `${e.id}|${e.n}|${e.t}|${e.eq}`).join("\n");
 
