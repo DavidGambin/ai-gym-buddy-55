@@ -15,6 +15,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { BottomNav } from "@/components/ui-forma";
 import { CoachFab } from "@/components/CoachChat";
+import { LocalAudioProvider } from "@/components/LocalAudio";
 import { AuthGate } from "@/components/AuthGate";
 
 function NotFoundComponent() {
@@ -67,8 +68,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "icon", href: "/icon.svg", type: "image/svg+xml" },
-      { rel: "apple-touch-icon", href: "/icon.svg" },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" },
     ],
@@ -99,11 +100,11 @@ function RootComponent() {
   const fab = !path.startsWith("/onboarding") && !path.startsWith("/coach") && !path.startsWith("/completado");
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="mx-auto min-h-screen max-w-md bg-background">
+      <div className="mx-auto min-h-screen w-full max-w-2xl bg-background">
         <AuthGate>
-          <Outlet />
+          <LocalAudioProvider><Outlet />
           {fab && <CoachFab />}
-          <BottomNav />
+          <BottomNav /></LocalAudioProvider>
         </AuthGate>
       </div>
     </QueryClientProvider>

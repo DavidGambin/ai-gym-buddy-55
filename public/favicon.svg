@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="brandGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6C5CE7" />
+      <stop offset="100%" stop-color="#C6FF3D" />
+    </linearGradient>
+  </defs>
+
+  <!-- Fondo oscuro de la app (#0E0F13) con estilo de tarjeta iOS -->
+  <rect width="512" height="512" rx="116" fill="#0E0F13"/>
+  
+  <!-- Borde sutil (#2E3240) -->
+  <rect x="8" y="8" width="496" height="496" rx="108" fill="none" stroke="#2E3240" stroke-width="8"/>
+  
+  <!-- Isotipo: Línea de progreso ascendente y pulso dinámico -->
+  <path d="M 120 340 L 210 220 L 280 270 L 380 150" fill="none" stroke="url(#brandGrad)" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Punto de éxito / Récord PR alcanzado -->
+  <circle cx="380" cy="150" r="16" fill="#C6FF3D"/>
+</svg>

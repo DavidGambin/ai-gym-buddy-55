@@ -4,6 +4,8 @@ import { useState } from "react";
 import { GROUPS, GROUP_LABEL, type Group } from "@/lib/exercises";
 import { DAYS, DAY_LABEL, buildDay, getState, setState, type Day, type Profile } from "@/lib/store";
 
+import { BrandLogo } from "@/components/BrandLogo";
+
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
     meta: [
@@ -38,8 +40,7 @@ function Onboarding() {
   if (step === 0) return (
     <div className="flex min-h-screen flex-col bg-hero px-6 pb-10 pt-24">
       <div className="flex-1">
-        <div className="grid h-20 w-20 place-items-center rounded-3xl bg-primary text-4xl font-black text-primary-foreground glow">F</div>
-        <h1 className="mt-8 text-5xl font-extrabold tracking-tight">Forma</h1>
+        <h1><BrandLogo stacked className="mx-auto w-full max-w-sm" /></h1>
         <p className="mt-3 max-w-xs text-lg text-muted-foreground">Tu rutina, tu progreso y un entrenador personal con IA. Todo en un sitio.</p>
       </div>
       <button onClick={() => setStep(1)} className="h-14 rounded-2xl bg-primary text-lg font-bold text-primary-foreground glow">Empezar</button>

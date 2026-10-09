@@ -4,8 +4,8 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type NowPlaying =
   | { connected: false }
-  | { connected: true; playing: false; track: null; message?: string }
-  | { connected: true; playing: boolean; track: { title: string; artist: string; image: string | null; progressMs: number; durationMs: number; url: string | null } };
+  | { connected: true; premium: boolean | null; playing: false; track: null; message?: string }
+  | { connected: true; premium: boolean | null; playing: boolean; track: { title: string; artist: string; image: string | null; progressMs: number; durationMs: number; url: string | null } };
 
 export const spotifyConnectUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -21,15 +21,19 @@ export const spotifyNowPlaying = createServerFn({ method: "GET" })
     const s = await import("./spotify.server");
     const token = await s.accessTokenFor(context.userId);
     if (!token) return { connected: false };
+    const profile = await fetch("https://api.spotify.com/v1/me", { headers: { Authorization: `Bearer ${token}` } });
+    const account = profile.ok ? await profile.json() as { product?: string } : null;
+    const premium = account?.product ? account.product === "premium" : null;
+    if (premium !== true) return { connected: true, premium, playing: false, track: null };
     const res = await fetch("https://api.spotify.com/v1/me/player?additional_types=track,episode", { headers: { Authorization: `Bearer ${token}` } });
-    if (res.status === 204) return { connected: true, playing: false, track: null };
+    if (res.status === 204) return { connected: true, premium, playing: false, track: null };
     if (res.status === 401) { await s.removeTokens(context.userId); return { connected: false }; }
-    if (!res.ok) { const t = await res.text(); console.error(`Spotify player [${res.status}]: ${t}`); return { connected: true, playing: false, track: null, message: "No se pudo leer Spotify" }; }
+    if (!res.ok) return { connected: true, premium, playing: false, track: null };
     const j = await res.json() as { is_playing: boolean; progress_ms: number; item: null | { name: string; duration_ms: number; external_urls?: { spotify?: string }; artists?: { name: string }[]; album?: { images?: { url: string }[] }; show?: { name: string; images?: { url: string }[] } } };
-    if (!j.item) return { connected: true, playing: false, track: null };
+    if (!j.item) return { connected: true, premium, playing: false, track: null };
     const it = j.item;
     return {
-      connected: true, playing: j.is_playing,
+      connected: true, premium, playing: j.is_playing,
       track: {
         title: it.name,
         artist: it.artists?.map((a) => a.name).join(", ") ?? it.show?.name ?? "",

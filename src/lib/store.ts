@@ -12,7 +12,10 @@ export const todayKey = (): Day => DAYS[(new Date().getDay() + 6) % 7];
 
 export type SetT = { kg: number; reps: number };
 export type RoutineEx = { exId: string; sets: SetT[] };
-export type SetLog = { exId: string; kg: number; reps: number; ts: number; workoutId: string };
+export type SetLog = { exId: string; kg: number; reps: number; ts: number; workoutId: string; effectiveKg?: number };
+export type LiveSet = SetT & { done: boolean };
+export type LiveExercise = { exId: string; sets: LiveSet[] };
+export type ActiveWorkout = { day: Day; start: number; items: LiveExercise[] };
 export type Workout = { id: string; day: Day; ts: number; durationSec: number; volume: number; exIds: string[]; photo?: string; note?: string };
 export type AiChange = { ts: number; summary: string };
 export type Profile = { weight: number; height: number; chest: number; waist: number; arm: number };
@@ -28,6 +31,8 @@ export type State = {
   aiChanges: AiChange[];
   snapshots: Record<Day, RoutineEx[]>[];
   recoveryHours: Partial<Record<Muscle, number>>;
+  activeWorkout?: ActiveWorkout;
+  musicMode?: "spotify" | "local";
 };
 
 const DEFAULT_PLAN: Record<Day, Group[]> = {
@@ -84,6 +89,28 @@ export function setState(fn: (s: State) => Partial<State>) {
   emit();
 }
 export function getState() { return state; }
+/** Entered dumbbell kg is per dumbbell; bodyweight loads use today's profile. */
+export function effectiveLoad(exId: string, kg: number, bodyWeight: number) {
+  const eq = EX_BY_ID[exId]?.eq;
+  if (eq === "body weight") return Math.max(0, bodyWeight);
+  return Math.max(0, kg) * (eq === "dumbbell" ? 2 : 1);
+}
+export function formatDuration(seconds: number) {
+  const sec = Math.max(0, Math.floor(seconds));
+  return `${String(Math.floor(sec / 3600)).padStart(2, "0")}:${String(Math.floor(sec / 60) % 60).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
+}
+export function updateWorkout(id: string, patch: Partial<Workout>) {
+  setState((s) => {
+    const original = s.workouts.find((w) => w.id === id);
+    if (!original) return {};
+    const ts = patch.ts;
+    if (ts !== undefined && (!Number.isFinite(ts) || ts > Date.now())) return {};
+    return {
+      workouts: s.workouts.map((w) => w.id === id ? { ...w, ...patch } : w),
+      sets: ts === undefined ? s.sets : s.sets.map((l) => l.workoutId === id ? { ...l, ts: l.ts + ts - original.ts } : l),
+    };
+  });
+}
 export function useStore<T>(sel: (s: State) => T): T {
   return useSyncExternalStore(
     (cb) => { subs.add(cb); return () => subs.delete(cb); },
