@@ -32,6 +32,7 @@ export type State = {
   snapshots: Record<Day, RoutineEx[]>[];
   recoveryHours: Partial<Record<Muscle, number>>;
   activeWorkout?: ActiveWorkout;
+  musicMode?: "spotify" | "local";
 };
 
 const DEFAULT_PLAN: Record<Day, Group[]> = {

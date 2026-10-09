@@ -1,5 +1,5 @@
 // Server-only Spotify helpers. Only import dynamically inside server handlers.
-export const SPOTIFY_SCOPES = "user-read-currently-playing user-read-playback-state user-modify-playback-state";
+export const SPOTIFY_SCOPES = "user-read-private user-read-currently-playing user-read-playback-state user-modify-playback-state";
 
 export function appOrigin(request: Request) {
   const url = new URL(request.url);
@@ -50,9 +50,10 @@ async function admin() { return (await import("@/integrations/supabase/client.se
 
 export async function exchangeCode(request: Request, code: string, userId: string) {
   const t = await tokenRequest({ grant_type: "authorization_code", code, redirect_uri: redirectUri(request) });
+  if (!t.refresh_token) throw new Error("Spotify no devolvió una autorización completa");
   const db = await admin();
   const { error } = await db.from("spotify_tokens").upsert({
-    user_id: userId, refresh_token: t.refresh_token!, access_token: t.access_token,
+    user_id: userId, refresh_token: t.refresh_token, access_token: t.access_token,
     expires_at: new Date(Date.now() + (t.expires_in - 60) * 1000).toISOString(), updated_at: new Date().toISOString(),
   });
   if (error) throw error;
