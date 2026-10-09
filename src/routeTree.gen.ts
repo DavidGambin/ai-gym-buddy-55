@@ -14,6 +14,7 @@ import { Route as BibliotecaRouteImport } from './routes/biblioteca'
 import { Route as CoachRouteImport } from './routes/coach'
 import { Route as CompletadoRouteImport } from './routes/completado'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as ProgresoRouteImport } from './routes/progreso'
 import { Route as RutinaRouteImport } from './routes/rutina'
 import { Route as EjercicioIdRouteImport } from './routes/ejercicio.$id'
@@ -43,6 +44,11 @@ const CompletadoRoute = CompletadoRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PerfilRoute = PerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProgresoRoute = ProgresoRouteImport.update({
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/coach': typeof CoachRoute
   '/completado': typeof CompletadoRoute
   '/onboarding': typeof OnboardingRoute
+  '/perfil': typeof PerfilRoute
   '/progreso': typeof ProgresoRoute
   '/rutina': typeof RutinaRoute
   '/ejercicio/$id': typeof EjercicioIdRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/coach': typeof CoachRoute
   '/completado': typeof CompletadoRoute
   '/onboarding': typeof OnboardingRoute
+  '/perfil': typeof PerfilRoute
   '/progreso': typeof ProgresoRoute
   '/rutina': typeof RutinaRoute
   '/ejercicio/$id': typeof EjercicioIdRoute
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/coach': typeof CoachRoute
   '/completado': typeof CompletadoRoute
   '/onboarding': typeof OnboardingRoute
+  '/perfil': typeof PerfilRoute
   '/progreso': typeof ProgresoRoute
   '/rutina': typeof RutinaRoute
   '/ejercicio/$id': typeof EjercicioIdRoute
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/coach'
     | '/completado'
     | '/onboarding'
+    | '/perfil'
     | '/progreso'
     | '/rutina'
     | '/ejercicio/$id'
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/coach'
     | '/completado'
     | '/onboarding'
+    | '/perfil'
     | '/progreso'
     | '/rutina'
     | '/ejercicio/$id'
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/coach'
     | '/completado'
     | '/onboarding'
+    | '/perfil'
     | '/progreso'
     | '/rutina'
     | '/ejercicio/$id'
@@ -154,6 +166,7 @@ export interface RootRouteChildren {
   CoachRoute: typeof CoachRoute
   CompletadoRoute: typeof CompletadoRoute
   OnboardingRoute: typeof OnboardingRoute
+  PerfilRoute: typeof PerfilRoute
   ProgresoRoute: typeof ProgresoRoute
   RutinaRoute: typeof RutinaRoute
   EjercicioIdRoute: typeof EjercicioIdRoute
@@ -196,6 +209,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/perfil': {
+      id: '/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof PerfilRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/progreso': {
@@ -242,6 +262,7 @@ const rootRouteChildren: RootRouteChildren = {
   CoachRoute: CoachRoute,
   CompletadoRoute: CompletadoRoute,
   OnboardingRoute: OnboardingRoute,
+  PerfilRoute: PerfilRoute,
   ProgresoRoute: ProgresoRoute,
   RutinaRoute: RutinaRoute,
   EjercicioIdRoute: EjercicioIdRoute,

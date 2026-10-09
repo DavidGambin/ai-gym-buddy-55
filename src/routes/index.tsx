@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ChevronRight, Flame, Play, Library, LogOut } from "lucide-react";
+import { ChevronRight, Flame, Play, Library, LogOut, UserRound } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { BrandLogo } from "@/components/BrandLogo";
 import { SpotifyPlayer } from "@/components/SpotifyPlayer";
 import { signOut } from "@/components/AuthGate";
 import { BodyMap } from "@/components/BodyMap";
@@ -36,7 +37,8 @@ function Index() {
 
   return (
     <div className="pb-safe bg-hero">
-      <PageHeader sub={new Date().toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })} title="Hola 👋" right={<div className="flex gap-2"><Link to="/biblioteca" className="grid h-11 w-11 place-items-center rounded-full border border-border bg-card" aria-label="Biblioteca"><Library className="h-5 w-5" /></Link><button onClick={() => { if (confirm("¿Cerrar sesión?")) void signOut(qc); }} className="grid h-11 w-11 place-items-center rounded-full border border-border bg-card" aria-label="Cerrar sesión"><LogOut className="h-5 w-5" /></button></div>} />
+      <div className="px-5 pt-[max(env(safe-area-inset-top),1rem)]"><BrandLogo className="w-52" /></div>
+      <PageHeader sub={new Date().toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })} title="Hola 👋" right={<div className="flex gap-2"><Link to="/perfil" className="grid h-11 w-11 place-items-center rounded-full border border-border bg-card" aria-label="Mi perfil"><UserRound className="h-5 w-5" /></Link><Link to="/biblioteca" className="grid h-11 w-11 place-items-center rounded-full border border-border bg-card" aria-label="Biblioteca"><Library className="h-5 w-5" /></Link><button onClick={() => { if (confirm("¿Cerrar sesión?")) void signOut(qc); }} className="grid h-11 w-11 place-items-center rounded-full border border-border bg-card" aria-label="Cerrar sesión"><LogOut className="h-5 w-5" /></button></div>} />
       <div className="space-y-4 px-5">
         <Card className="border-primary/30">
           <p className="text-xs font-semibold uppercase tracking-wider text-primary">Hoy · {DAY_LABEL[day]}</p>
