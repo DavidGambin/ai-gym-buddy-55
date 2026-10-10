@@ -4,10 +4,10 @@ import { CoachChat } from "@/components/CoachChat";
 
 export const Route = createFileRoute("/coach")({
   head: () => ({
-    meta: [
-      { title: "Coach IA — Forma" },
+    meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, 
+      { title: "Coach IA — SpotterBro.ai" },
       { name: "description", content: "Habla con tu entrenador personal con IA: resuelve dudas y ajusta tu rutina al momento." },
-      { property: "og:title", content: "Coach IA — Forma" },
+      { property: "og:title", content: "Coach IA — SpotterBro.ai" },
       { property: "og:description", content: "Tu entrenador personal con IA que ajusta tu rutina en directo." },
     ],
   }),

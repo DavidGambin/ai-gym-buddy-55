@@ -6,7 +6,7 @@ import { EX_BY_ID } from "@/lib/exercises";
 import { DAY_LABEL, fmt, useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/progreso")({
-  head: () => ({ meta: [{ title: "Progreso — Forma" }, { name: "description", content: "Récords por ejercicio, evolución de pesos e historial de entrenos." }, { property: "og:title", content: "Mi progreso — Forma" }, { property: "og:description", content: "Récords, gráficas de evolución e historial de entrenos." }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { title: "Progreso — SpotterBro.ai" }, { name: "description", content: "Récords por ejercicio, evolución de pesos e historial de entrenos." }, { property: "og:title", content: "Mi progreso — SpotterBro.ai" }, { property: "og:description", content: "Récords, gráficas de evolución e historial de entrenos." }] }),
   component: Progreso,
 });
 
