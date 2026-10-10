@@ -12,10 +12,10 @@ import { DAY_LABEL, computeFatigue, fmt, levelOf, todayKey, useStore } from "@/l
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    meta: [
-      { title: "Inicio — Forma" },
+    meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, 
+      { title: "Inicio — SpotterBro.ai" },
       { name: "description", content: "Tu entreno de hoy y el mapa de fatiga muscular de las últimas 48 horas." },
-      { property: "og:title", content: "Forma — Tu gimnasio con coach IA" },
+      { property: "og:title", content: "SpotterBro.ai — Tu gimnasio con coach IA" },
       { property: "og:description", content: "Entreno de hoy, mapa de fatiga y coach IA en tu bolsillo." },
     ],
   }),

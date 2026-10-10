@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { setState, useStore, type Profile } from "@/lib/store";
 
 export const Route = createFileRoute("/perfil")({
-  head: () => ({ meta: [{ title: "Mi perfil — SpotterBro.ai" }, { name: "description", content: "Actualiza tu peso y medidas corporales." }, { property: "og:title", content: "Mi perfil — SpotterBro.ai" }, { property: "og:description", content: "Tus medidas corporales y peso actual." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { title: "Mi perfil — SpotterBro.ai" }, { name: "description", content: "Actualiza tu peso y medidas corporales." }, { property: "og:title", content: "Mi perfil — SpotterBro.ai" }, { property: "og:description", content: "Tus medidas corporales y peso actual." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: ProfilePage,
 });
 

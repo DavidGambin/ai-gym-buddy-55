@@ -7,10 +7,10 @@ import type { Group } from "@/lib/exercises";
 
 export const Route = createFileRoute("/biblioteca")({
   head: () => ({
-    meta: [
-      { title: "Biblioteca de ejercicios — Forma" },
+    meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, 
+      { title: "Biblioteca de ejercicios — SpotterBro.ai" },
       { name: "description", content: "Más de 1.300 ejercicios con animación, músculos trabajados y guía de ejecución." },
-      { property: "og:title", content: "Biblioteca de ejercicios — Forma" },
+      { property: "og:title", content: "Biblioteca de ejercicios — SpotterBro.ai" },
       { property: "og:description", content: "Ejercicios con GIF, músculos y pasos de ejecución." },
     ],
   }),

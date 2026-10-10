@@ -8,10 +8,10 @@ import { BrandLogo } from "@/components/BrandLogo";
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
-    meta: [
-      { title: "Empieza — Forma" },
-      { name: "description", content: "Configura tus datos y tu semana de entreno en Forma." },
-      { property: "og:title", content: "Empieza con Forma" },
+    meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, 
+      { title: "Empieza — SpotterBro.ai" },
+      { name: "description", content: "Configura tus datos y tu semana de entreno en SpotterBro.ai." },
+      { property: "og:title", content: "Empieza con SpotterBro.ai" },
       { property: "og:description", content: "Configura tu semana de entreno en un minuto." },
     ],
   }),

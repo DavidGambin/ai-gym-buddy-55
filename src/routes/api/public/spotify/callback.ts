@@ -20,7 +20,7 @@ export const Route = createFileRoute("/api/public/spotify/callback")({
         if (!userId) return page(false, "El enlace ha caducado. Inténtalo de nuevo.");
         try { await s.exchangeCode(request, code, userId); }
         catch (e) { console.error(e); return page(false, "No se pudo conectar con Spotify."); }
-        return page(true, "¡Spotify conectado! Ya puedes volver a Forma.");
+        return page(true, "¡Spotify conectado! Ya puedes volver a SpotterBro.ai.");
       },
     },
   },

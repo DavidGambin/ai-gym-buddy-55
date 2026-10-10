@@ -37,10 +37,12 @@
   --color-fatigue-high: var(--fatigue-high);
   --color-fatigue-mid: var(--fatigue-mid);
   --color-fatigue-low: var(--fatigue-low);
+  --color-spotify: var(--spotify);
   --color-surface-2: var(--surface-2);
 }
 
 :root {
+  --spotify: oklch(0.68 0.19 149);
   --radius: 0.875rem;
   --background: oklch(0.169 0.008 274.4);
   --foreground: oklch(0.964 0.003 264.5);
@@ -82,3 +84,19 @@
 @utility bg-hero { background-image: var(--gradient-hero); }
 @utility pb-safe { padding-bottom: calc(env(safe-area-inset-bottom) + 6rem); }
 @utility muscle-glow { filter: drop-shadow(0 0 6px var(--fatigue-high)); }
+
+@layer base {
+  html { overflow-x: clip; }
+  body { margin: 0; min-width: 320px; }
+  input, textarea { min-width: 0; }
+  img { max-width: 100%; }
+  h1, h2, h3 { overflow-wrap: break-word; letter-spacing: 0; }
+  button { max-width: 100%; }
+}
+.spotify-progress { appearance: none; border: 0; overflow: hidden; border-radius: 1rem; background: var(--background); }
+.spotify-progress::-webkit-progress-bar { background: var(--background); }
+.spotify-progress::-webkit-progress-value { background: var(--spotify); }
+.spotify-progress::-moz-progress-bar { background: var(--spotify); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

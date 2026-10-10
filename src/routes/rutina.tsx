@@ -7,10 +7,10 @@ import { DAYS, DAY_LABEL, buildDay, defaultSets, mutateRoutine, todayKey, useSto
 
 export const Route = createFileRoute("/rutina")({
   head: () => ({
-    meta: [
-      { title: "Mi rutina — Forma" },
+    meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, 
+      { title: "Mi rutina — SpotterBro.ai" },
       { name: "description", content: "Tu plan semanal de entreno día a día, editable a mano o con IA." },
-      { property: "og:title", content: "Mi rutina semanal — Forma" },
+      { property: "og:title", content: "Mi rutina semanal — SpotterBro.ai" },
       { property: "og:description", content: "Plan semanal editable con ejercicios por grupo muscular." },
     ],
   }),

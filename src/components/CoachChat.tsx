@@ -106,7 +106,7 @@ export function CoachChat({ compact = false }: { compact?: boolean }) {
             <p className="text-lg font-bold">Tu entrenador personal</p>
             <p className="mx-auto mt-1 max-w-xs text-sm text-muted-foreground">Pregúntame lo que quieras o pídeme cambios en tu rutina.</p>
             <div className="mt-5 flex flex-col gap-2">
-              {chips.map((c) => <Button variant="ghost" key={c} onClick={() => send(c)} className="rounded-xl border border-border bg-card px-4 py-3 text-left text-sm">{c}</Button>)}
+              {chips.map((c) => <Button variant="ghost" key={c} onClick={() => send(c)} className="h-auto whitespace-normal rounded-xl border border-border bg-card px-4 py-3 text-left text-sm">{c}</Button>)}
             </div>
           </div>
         )}
@@ -131,7 +131,7 @@ export function CoachChat({ compact = false }: { compact?: boolean }) {
       </div>
       <form onSubmit={(e) => { e.preventDefault(); send(text); }} className={`flex gap-2 border-t border-border bg-background p-3 shrink-0 ${compact ? "pb-[max(env(safe-area-inset-bottom),0.75rem)]" : "mb-[calc(env(safe-area-inset-bottom)+5rem)]"}`}>
         <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Escribe a tu coach…" className="min-w-0 flex-1 rounded-full border border-border bg-card px-4 py-3 text-[15px] outline-none focus:border-primary" />
-        <Button variant="ghost" disabled={busy || !text.trim()} className="grid h-12 w-12 place-items-center rounded-full bg-primary text-primary-foreground disabled:opacity-40"><ArrowUp /></Button>
+        <Button variant="ghost" aria-label="Enviar mensaje" disabled={busy || !text.trim()} className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground disabled:opacity-40"><ArrowUp /></Button>
       </form>
     </div>
   );

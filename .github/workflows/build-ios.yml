@@ -25,12 +25,12 @@ jobs:
     - name: Preparar Capacitor para SSR (App en la nube)
       run: |
         mkdir -p dummy_web_dir
-        echo "<!DOCTYPE html><html><head><title>FormaApp</title></head><body></body></html>" > dummy_web_dir/index.html
+        echo "<!DOCTYPE html><html><head><title>SpotterBro</title></head><body></body></html>" > dummy_web_dir/index.html
         
         cat <<EOF > capacitor.config.json
         {
           "appId": "com.davidgambin.forma",
-          "appName": "FormaApp",
+          "appName": "SpotterBro",
           "webDir": "dummy_web_dir",
           "server": {
             "url": "https://ai-gym-buddy-55.lovable.app/", 
@@ -72,10 +72,10 @@ jobs:
         cd ios/App/derivedData/Build/Products/Release-iphoneos
         mkdir Payload
         mv App.app Payload/
-        zip -r FormaApp.ipa Payload
+        zip -r SpotterBro.ipa Payload
 
     - name: Subir .ipa para descargar
       uses: actions/upload-artifact@v4
       with:
-        name: FormaApp-IPA
-        path: ios/App/derivedData/Build/Products/Release-iphoneos/FormaApp.ipa
+        name: SpotterBro-IPA
+        path: ios/App/derivedData/Build/Products/Release-iphoneos/SpotterBro.ipa

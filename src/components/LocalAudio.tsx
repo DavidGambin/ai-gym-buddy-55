@@ -14,12 +14,13 @@ export function LocalAudioProvider({ children }: { children: ReactNode }) {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState("");
+  const resumeAfterChange = useRef(false);
   const allUrls = useRef<string[]>([]);
   useEffect(() => () => allUrls.current.forEach(URL.revokeObjectURL), []);
   async function play() {
     try { await audio.current?.play(); setError(""); } catch { setError("No se pudo reproducir este archivo."); }
   }
-  function skip(delta: number) { if (tracks.length) { setIndex((i) => (i + delta + tracks.length) % tracks.length); } }
+  function skip(delta: number) { if (tracks.length) { resumeAfterChange.current = true; setIndex((i) => (i + delta + tracks.length) % tracks.length); } }
   function toggle() { if (audio.current?.paused) void play(); else audio.current?.pause(); }
   function load(files: FileList) {
     audio.current?.pause();
@@ -41,7 +42,7 @@ export function LocalAudioProvider({ children }: { children: ReactNode }) {
   }, [track, tracks.length]);
   return <AudioContext.Provider value={{ tracks, index, playing, progress, duration, error, load, toggle, skip, seek: (v) => { if (audio.current) audio.current.currentTime = v; } }}>
     {children}
-    <audio ref={audio} src={track?.url} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onTimeUpdate={() => setProgress(audio.current?.currentTime ?? 0)} onLoadedMetadata={() => setDuration(Number.isFinite(audio.current?.duration) ? audio.current?.duration ?? 0 : 0)} onEnded={() => { skip(1); if (tracks.length === 1 && audio.current) { audio.current.currentTime = 0; void play(); } }} onError={() => setError("Este formato de audio no se puede reproducir.")} />
+    <audio ref={audio} src={track?.url} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onTimeUpdate={() => setProgress(audio.current?.currentTime ?? 0)} onLoadedMetadata={() => { setDuration(Number.isFinite(audio.current?.duration) ? audio.current?.duration ?? 0 : 0); if (resumeAfterChange.current) { resumeAfterChange.current = false; void play(); } }} onEnded={() => { skip(1); if (tracks.length === 1 && audio.current) { audio.current.currentTime = 0; void play(); } }} onError={() => setError("Este formato de audio no se puede reproducir.")} />
   </AudioContext.Provider>;
 }
 

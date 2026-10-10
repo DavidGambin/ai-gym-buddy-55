@@ -6,10 +6,10 @@ import { bestKg, useStore } from "@/lib/store";
 export const Route = createFileRoute("/ejercicio/$id")({
   loader: ({ params }) => { const e = EX_BY_ID[params.id]; if (!e) throw notFound(); return { e }; },
   head: ({ loaderData }) => {
-    if (!loaderData) return { meta: [{ title: "Ejercicio no encontrado — Forma" }, { name: "robots", content: "noindex" }] };
-    const t = `${loaderData.e.n} — Forma`; const d = `Cómo hacer ${loaderData.e.n}: músculos, equipamiento y pasos de ejecución.`;
+    if (!loaderData) return { meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { title: "Ejercicio no encontrado — SpotterBro.ai" }, { name: "robots", content: "noindex" }] };
+    const t = `${loaderData.e.n} — SpotterBro.ai`; const d = `Cómo hacer ${loaderData.e.n}: músculos, equipamiento y pasos de ejecución.`;
     const img = gifUrl(loaderData.e);
-    return { meta: [{ title: t }, { name: "description", content: d }, { property: "og:title", content: t }, { property: "og:description", content: d }, { property: "og:image", content: img }, { name: "twitter:image", content: img }] };
+    return { meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { title: t }, { name: "description", content: d }, { property: "og:title", content: t }, { property: "og:description", content: d }, { property: "og:image", content: img }, { name: "twitter:image", content: img }] };
   },
   notFoundComponent: () => <p className="p-10 text-center">Ejercicio no encontrado.</p>,
   errorComponent: () => <p className="p-10 text-center">No se pudo cargar el ejercicio.</p>,
