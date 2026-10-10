@@ -62,9 +62,12 @@ const emit = () => subs.forEach((f) => f());
 
 async function persist() {
   if (!userId) return;
+  const owner = userId;
+  const snapshot = state;
   const { supabase } = await import("@/integrations/supabase/client");
-  const { loaded: _l, snapshots: _s, ...data } = state;
-  const { error } = await supabase.from("user_data").upsert({ user_id: userId, data: data as never, updated_at: new Date().toISOString() });
+  if (userId !== owner) return;
+  const { loaded: _l, snapshots: _s, ...data } = snapshot;
+  const { error } = await supabase.from("user_data").upsert({ user_id: owner, data: data as never, updated_at: new Date().toISOString() });
   if (error) console.error("No se pudo guardar", error);
 }
 function schedulePersist() { clearTimeout(saveTimer); saveTimer = setTimeout(persist, 600); }
@@ -78,6 +81,10 @@ export async function loadUser(id: string) {
   if (userId !== id) return;
   if (error) console.error(error);
   state = { ...fresh(), ...((data?.data as Partial<State>) ?? {}), snapshots: [], loaded: true };
+  try {
+    const cached = JSON.parse(localStorage.getItem(`spotterbro.active.${id}`) ?? "null") as ActiveWorkout | null;
+    if (cached && DAYS.includes(cached.day) && Array.isArray(cached.items) && Number.isFinite(cached.start)) state = { ...state, activeWorkout: cached };
+  } catch { /* Cloud state remains the fallback. */ }
   if (!data) void persist();
   emit();
 }
@@ -85,6 +92,12 @@ export function clearUser() { clearTimeout(saveTimer); userId = null; state = SE
 
 export function setState(fn: (s: State) => Partial<State>) {
   state = { ...state, ...fn(state) };
+  if (userId && state.loaded) {
+    try {
+      const key = `spotterbro.active.${userId}`;
+      if (state.activeWorkout) localStorage.setItem(key, JSON.stringify(state.activeWorkout)); else localStorage.removeItem(key);
+    } catch { /* Cloud sync still works if device storage is unavailable. */ }
+  }
   schedulePersist();
   emit();
 }

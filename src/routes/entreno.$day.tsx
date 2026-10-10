@@ -25,6 +25,7 @@ function Live() {
   const { day } = Route.useLoaderData();
   const nav = useNavigate();
   const profile = useStore((s) => s.profile);
+  const loaded = useStore((s) => s.loaded);
   const [items, setItems] = useState<LEx[] | null>(null);
   const [start, setStart] = useState(() => Date.now());
   const [now, setNow] = useState(start);
@@ -34,6 +35,7 @@ function Live() {
   const [swap, setSwap] = useState<{ i: number; to: string } | null>(null);
 
   useEffect(() => {
+    if (!loaded) return;
     const active = getState().activeWorkout;
     if (active) {
       if (active.day !== day) { void nav({ to: "/entreno/$day", params: { day: active.day }, replace: true }); return; }
@@ -41,7 +43,7 @@ function Live() {
     }
     const st = Date.now(); setStart(st); setNow(st);
     setItems(getState().routine[day].map((r) => ({ exId: r.exId, sets: r.sets.map((s) => ({ ...s, done: false })) })));
-  }, [day, nav]);
+  }, [day, nav, loaded]);
   useEffect(() => { if (items) setState(() => ({ activeWorkout: { day, start, items } })); }, [items, start, day]);
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, []);
   if (!items) return <div className="min-h-screen" />;

@@ -13,7 +13,7 @@ export const Route = createFileRoute("/coach")({
   }),
   component: () => (
     <div className="flex h-[100dvh] flex-col">
-      <header className="flex items-center gap-2 px-5 pb-2 pt-6"><Sparkles className="text-primary" /><h1 className="text-2xl font-bold">Coach IA</h1></header>
+      <header className="flex shrink-0 items-center gap-2 px-5 pb-2 pt-[max(env(safe-area-inset-top),1rem)]"><Sparkles className="text-primary" /><h1 className="text-2xl font-bold">Coach IA</h1></header>
       <div className="min-h-0 flex-1"><CoachChat /></div>
     </div>
   ),

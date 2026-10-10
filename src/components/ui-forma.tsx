@@ -9,9 +9,9 @@ export function BottomNav() {
   const activeWorkout = useStore((s) => s.activeWorkout);
   if (path.startsWith("/onboarding") || path.startsWith("/completado")) return null;
   const items = [
-    { to: "/entreno/$day", label: "Entreno", Icon: Play },
     { to: "/", label: "Inicio", Icon: Home },
     { to: "/rutina", label: "Rutina", Icon: Dumbbell },
+    { to: "/entreno/$day", label: "Entreno", Icon: Play },
     { to: "/progreso", label: "Progreso", Icon: LineChart },
     { to: "/coach", label: "Coach IA", Icon: Sparkles },
   ] as const;
@@ -21,7 +21,7 @@ export function BottomNav() {
         {items.map(({ to, label, Icon }) => {
           const active = to === "/entreno/$day" ? path.startsWith("/entreno") : to === "/" ? path === "/" : path.startsWith(to);
           return (
-            <Link key={to} to={to} params={to === "/entreno/$day" ? { day: activeWorkout?.day ?? todayKey() } : {}} className={`flex flex-col items-center relative min-w-0 gap-1 px-2 py-1 text-[11px] font-semibold ${active ? "text-primary" : "text-muted-foreground"}`}>
+            <Link key={to} to={to} params={to === "/entreno/$day" ? { day: activeWorkout?.day ?? todayKey() } : {}} className={`flex h-[62px] flex-col items-center relative min-w-0 gap-1 px-2 py-1 text-[11px] font-semibold ${active ? "text-primary" : "text-muted-foreground"}`}>
               <Icon className="h-6 w-6" strokeWidth={active ? 2.4 : 1.8} />{label}
                {to === "/entreno/$day" && activeWorkout && <span className="motion-safe:animate-pulse whitespace-nowrap text-[9px] font-bold text-primary">En curso</span>}
             </Link>

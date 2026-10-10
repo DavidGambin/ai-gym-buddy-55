@@ -3,7 +3,7 @@ import { Bar, BarChart, Cell, ResponsiveContainer, XAxis } from "recharts";
 import { useMemo, useState } from "react";
 import { Card, PageHeader, Thumb } from "@/components/ui-forma";
 import { EX_BY_ID } from "@/lib/exercises";
-import { DAY_LABEL, fmt, useStore } from "@/lib/store";
+import { DAY_LABEL, fmt, formatDuration, useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/progreso")({
   head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { title: "Progreso — SpotterBro.ai" }, { name: "description", content: "Récords por ejercicio, evolución de pesos e historial de entrenos." }, { property: "og:title", content: "Mi progreso — SpotterBro.ai" }, { property: "og:description", content: "Récords, gráficas de evolución e historial de entrenos." }] }),
@@ -15,7 +15,7 @@ function Progreso() {
   const [tab, setTab] = useState<"rec" | "hist">("rec");
   const data = useMemo(() => {
     const by: Record<string, { ts: number; kg: number }[]> = {};
-    for (const l of s.sets) { const arr = (by[l.exId] ??= []); const last = arr[arr.length - 1]; if (last && last.ts === l.ts) last.kg = Math.max(last.kg, l.kg); else arr.push({ ts: l.ts, kg: l.kg }); }
+    for (const l of [...s.sets].sort((a, b) => a.ts - b.ts)) { const arr = (by[l.exId] ??= []); const last = arr[arr.length - 1]; if (last && last.ts === l.ts) last.kg = Math.max(last.kg, l.kg); else arr.push({ ts: l.ts, kg: l.kg }); }
     const week = Date.now() - 7 * 864e5;
     return Object.entries(by).map(([id, h]) => {
       const max = Math.max(...h.map((x) => x.kg)); const prIdx = h.findIndex((x) => x.kg === max);
@@ -49,11 +49,11 @@ function Progreso() {
             </div>
           </Card>
         ))}
-        {tab === "hist" && [...s.workouts].reverse().map((w) => (
+        {tab === "hist" && [...s.workouts].sort((a, b) => b.ts - a.ts).map((w) => (
           <Link key={w.id} to="/completado" search={{ w: w.id }} className="block">
-            <Card className="flex items-center justify-between">
-              <div><p className="font-bold">{DAY_LABEL[w.day]}</p><p className="text-xs text-muted-foreground">{new Date(w.ts).toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" })} · {Math.round(w.durationSec / 60)} min · {w.exIds.length} ejercicios</p></div>
-              <p className="text-lg font-bold text-primary">{fmt(w.volume)} kg</p>
+            <Card className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+              <div className="min-w-0"><p className="font-bold">{DAY_LABEL[w.day]}</p><p className="text-xs text-muted-foreground">{new Date(w.ts).toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" })} · {formatDuration(w.durationSec)} · {w.exIds.length} ejercicios</p></div>
+              <p className="shrink-0 text-lg font-bold text-primary">{fmt(w.volume)} kg</p>
             </Card>
           </Link>
         ))}
