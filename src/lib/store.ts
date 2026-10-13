@@ -32,7 +32,6 @@ export type State = {
   snapshots: Record<Day, RoutineEx[]>[];
   recoveryHours: Partial<Record<Muscle, number>>;
   activeWorkout?: ActiveWorkout;
-  musicMode?: "spotify" | "local";
 };
 
 const DEFAULT_PLAN: Record<Day, Group[]> = {
@@ -123,6 +122,15 @@ export function updateWorkout(id: string, patch: Partial<Workout>) {
       sets: ts === undefined ? s.sets : s.sets.map((l) => l.workoutId === id ? { ...l, ts: l.ts + ts - original.ts } : l),
     };
   });
+}
+export function discardWorkout() {
+  setState(() => ({ activeWorkout: undefined }));
+}
+export function deleteWorkout(id: string) {
+  setState((s) => ({
+    workouts: s.workouts.filter((w) => w.id !== id),
+    sets: s.sets.filter((l) => l.workoutId !== id),
+  }));
 }
 export function useStore<T>(sel: (s: State) => T): T {
   return useSyncExternalStore(

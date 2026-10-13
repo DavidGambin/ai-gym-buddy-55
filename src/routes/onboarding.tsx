@@ -38,9 +38,9 @@ function Onboarding() {
   }
 
   if (step === 0) return (
-    <div className="flex min-h-screen flex-col bg-hero px-6 pb-10 pt-24">
+    <div className="flex min-h-dvh flex-col px-6 pb-10 pt-[max(env(safe-area-inset-top),4rem)]">
       <div className="flex-1">
-        <h1><BrandLogo stacked className="mx-auto w-full max-w-sm" /></h1>
+        <h1><BrandLogo stacked className="mx-auto w-64 max-w-full" /></h1>
         <p className="mt-3 max-w-xs text-lg text-muted-foreground">Tu rutina, tu progreso y un entrenador personal con IA. Todo en un sitio.</p>
       </div>
       <button onClick={() => setStep(1)} className="h-14 rounded-2xl bg-primary text-lg font-bold text-primary-foreground glow">Empezar</button>

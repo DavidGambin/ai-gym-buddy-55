@@ -1,4 +1,11 @@
-# Requested changes
+# Current requested changes
+- [ ] Integrate logos with app colors and remove mismatched frames/gradients
+- [ ] Discard active workouts with confirmation
+- [ ] Delete historical workouts and their associated set logs
+- [ ] Remove local audio; show playback only for confirmed Spotify Premium
+- [ ] Verify deletion, discard, playback visibility and logo rendering
+
+# Previous changes
 - [x] SpotterBro.ai name, uploaded logos and install icons
 - [x] Ongoing workout tab and account-scoped resume
 - [x] Mobile safe areas, compact workout header and coach layout

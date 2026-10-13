@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Bar, BarChart, Cell, ResponsiveContainer, XAxis } from "recharts";
 import { useMemo, useState } from "react";
+import { Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card, PageHeader, Thumb } from "@/components/ui-forma";
 import { EX_BY_ID } from "@/lib/exercises";
-import { DAY_LABEL, fmt, formatDuration, useStore } from "@/lib/store";
+import { DAY_LABEL, deleteWorkout, fmt, formatDuration, useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/progreso")({
   head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { title: "Progreso — SpotterBro.ai" }, { name: "description", content: "Récords por ejercicio, evolución de pesos e historial de entrenos." }, { property: "og:title", content: "Mi progreso — SpotterBro.ai" }, { property: "og:description", content: "Récords, gráficas de evolución e historial de entrenos." }] }),
@@ -50,14 +52,17 @@ function Progreso() {
           </Card>
         ))}
         {tab === "hist" && [...s.workouts].sort((a, b) => b.ts - a.ts).map((w) => (
-          <Link key={w.id} to="/completado" search={{ w: w.id }} className="block">
-            <Card className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+            <Card key={w.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+              <Link to="/completado" search={{ w: w.id }} className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
               <div className="min-w-0"><p className="font-bold">{DAY_LABEL[w.day]}</p><p className="text-xs text-muted-foreground">{new Date(w.ts).toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" })} · {formatDuration(w.durationSec)} · {w.exIds.length} ejercicios</p></div>
               <p className="shrink-0 text-lg font-bold text-primary">{fmt(w.volume)} kg</p>
+              </Link>
+              <Button variant="ghost" size="icon" className="text-destructive" aria-label={`Borrar entreno del ${new Date(w.ts).toLocaleDateString("es-ES")}`} title="Borrar entreno" onClick={() => {
+                if (window.confirm("¿Borrar este entreno? Se eliminarán sus series, y se actualizarán tus récords y el mapa de fatiga. Esta acción no se puede deshacer.")) deleteWorkout(w.id);
+              }}><Trash2 className="h-4 w-4" /></Button>
             </Card>
-          </Link>
         ))}
-        {data.length === 0 && <p className="text-center text-muted-foreground">Completa tu primer entreno para ver tu progreso.</p>}
+        {(tab === "hist" ? s.workouts.length === 0 : data.length === 0) && <p className="text-center text-muted-foreground">Completa tu primer entreno para ver tu progreso.</p>}
       </div>
     </div>
   );
