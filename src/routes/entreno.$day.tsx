@@ -2,11 +2,11 @@ import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-ro
 import { ArrowDown, ArrowRight, ArrowUp, Check, ChevronLeft, Clock, Minus, Plus, Repeat, Trash2, Users } from "lucide-react";
 import { GroupedList, SearchFilters } from "@/components/ExercisePicker";
 import type { Group } from "@/lib/exercises";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatedNumber, ExRow } from "@/components/ui-forma";
 import { EX_BY_ID, GROUP_LABEL, alternativeFor, demand, eqLabel, muscleLabel } from "@/lib/exercises";
-import { SpotifyPlayer } from "@/components/SpotifyPlayer";
-import { DAYS, DAY_LABEL, defaultSets, getState, setState, useStore, effectiveLoad, formatDuration, type Day, type SetLog } from "@/lib/store";
+import { SpotifyPlayer, useSpotifyStatus } from "@/components/SpotifyPlayer";
+import { DAYS, DAY_LABEL, defaultSets, discardWorkout, getState, setState, useStore, effectiveLoad, formatDuration, type Day, type SetLog } from "@/lib/store";
 
 import { Button } from "@/components/ui/button";
 
@@ -24,6 +24,8 @@ type LEx = { exId: string; sets: LSet[] };
 function Live() {
   const { day } = Route.useLoaderData();
   const nav = useNavigate();
+  const ended = useRef(false);
+  const spotify = useSpotifyStatus();
   const profile = useStore((s) => s.profile);
   const loaded = useStore((s) => s.loaded);
   const [items, setItems] = useState<LEx[] | null>(null);
@@ -44,7 +46,7 @@ function Live() {
     const st = Date.now(); setStart(st); setNow(st);
     setItems(getState().routine[day].map((r) => ({ exId: r.exId, sets: r.sets.map((s) => ({ ...s, done: false })) })));
   }, [day, nav, loaded]);
-  useEffect(() => { if (items) setState(() => ({ activeWorkout: { day, start, items } })); }, [items, start, day]);
+  useEffect(() => { if (items && !ended.current) setState(() => ({ activeWorkout: { day, start, items } })); }, [items, start, day]);
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, []);
   if (!items) return <div className="min-h-screen" />;
 
@@ -69,6 +71,7 @@ function Live() {
 
   function finish() {
     if (!items) return;
+    ended.current = true;
     const ts = Date.now(); const id = "w" + ts;
     const logs: SetLog[] = items.flatMap((e) => e.sets.filter((s) => s.done).map((s) => ({ exId: e.exId, kg: EX_BY_ID[e.exId]?.eq === "body weight" ? profile.weight : s.kg, effectiveKg: effectiveLoad(e.exId, s.kg, profile.weight), reps: s.reps, ts, workoutId: id })));
     setState((s) => ({
@@ -83,7 +86,7 @@ function Live() {
 
   const groups = getState().plan[day];
   return (
-    <div className="pb-[calc(env(safe-area-inset-bottom)+17rem)]">
+    <div className={spotify.data?.connected && spotify.data.premium === true ? "pb-[calc(env(safe-area-inset-bottom)+13rem)]" : "pb-safe"}>
       <header className="sticky top-0 z-30 border-b border-border bg-background/95 px-4 pb-3 pt-[max(env(safe-area-inset-top),0.75rem)] backdrop-blur-xl">
         <div className="grid grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-2">
           <Link to="/" className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-card" aria-label="Salir"><ChevronLeft /></Link>
@@ -126,11 +129,15 @@ function Live() {
         ))}
         <Button variant="ghost" onClick={() => setAdding(true)} className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-primary/60 font-semibold text-primary"><Plus className="h-4 w-4" />Añadir ejercicio</Button>
         <Button variant="ghost" onClick={finish} className="h-14 w-full rounded-2xl bg-primary text-lg font-bold text-primary-foreground glow">Terminar entreno</Button>
+        <Button variant="ghost" className="h-12 w-full text-destructive" onClick={() => {
+          if (!window.confirm("¿Descartar el entreno en curso? Sus series no se guardarán en el historial.")) return;
+          ended.current = true;
+          discardWorkout();
+          void nav({ to: "/", replace: true });
+        }}><Trash2 className="h-4 w-4" />Descartar entreno</Button>
       </div>
 
-      <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+4.5rem)] z-30 mx-auto w-full max-w-2xl p-3" style={{ paddingBottom: "max(env(safe-area-inset-bottom), 12px)" }}>
-        <SpotifyPlayer compact />
-      </div>
+      <SpotifyPlayer compact />
 
       {busy && (
         <Sheet onClose={() => setBusy(null)} title="Nuevo orden propuesto">
