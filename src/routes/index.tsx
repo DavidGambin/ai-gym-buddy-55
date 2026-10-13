@@ -33,10 +33,10 @@ function Index() {
   const levels = Object.fromEntries(Object.entries(fatigue).map(([m, v]) => [m, levelOf(v)])) as Record<Muscle, ReturnType<typeof levelOf>>;
   const hot = (Object.keys(levels) as Muscle[]).filter((m) => levels[m] === "high");
   const warm = (Object.keys(levels) as Muscle[]).filter((m) => levels[m] && levels[m] !== "high");
-  const lastW = s.workouts[s.workouts.length - 1];
+  const lastW = [...s.workouts].sort((a, b) => b.ts - a.ts)[0];
 
   return (
-    <div className="pb-safe bg-hero">
+    <div className="pb-safe">
       <div className="px-5 pt-[max(env(safe-area-inset-top),1rem)]"><BrandLogo className="w-52" /></div>
       <PageHeader sub={new Date().toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })} title="Hola 👋" right={<div className="flex gap-2"><Link to="/perfil" className="grid h-11 w-11 place-items-center rounded-full border border-border bg-card" aria-label="Mi perfil"><UserRound className="h-5 w-5" /></Link><Link to="/biblioteca" className="grid h-11 w-11 place-items-center rounded-full border border-border bg-card" aria-label="Biblioteca"><Library className="h-5 w-5" /></Link><button onClick={() => { if (confirm("¿Cerrar sesión?")) void signOut(qc); }} className="grid h-11 w-11 place-items-center rounded-full border border-border bg-card" aria-label="Cerrar sesión"><LogOut className="h-5 w-5" /></button></div>} />
       <div className="space-y-4 px-5">

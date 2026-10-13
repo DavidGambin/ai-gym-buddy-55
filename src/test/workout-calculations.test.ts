@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { EXERCISES } from "@/lib/exercises";
-import { computeFatigue, effectiveLoad, formatDuration, getState, setState, updateWorkout } from "@/lib/store";
+import { bestKg, computeFatigue, deleteWorkout, discardWorkout, effectiveLoad, formatDuration, getState, setState, updateWorkout } from "@/lib/store";
 
 describe("Workout loads", () => {
   it("counts both dumbbells without changing the entered kg", () => {
@@ -32,5 +32,31 @@ describe("Workout date and fatigue", () => {
     expect(computeFatigue(getState(), now).pecho).toBeLessThan(before);
     updateWorkout("date-test", { durationSec: 7200 });
     expect(getState().sets[0].ts).toBe(now - 48 * 3600e3);
+  });
+});
+
+describe("Removing workouts", () => {
+  it("discards only the active session without changing the routine or history", () => {
+    setState(() => ({ activeWorkout: { day: "lunes", start: Date.now(), items: [] } }));
+    const before = getState();
+    discardWorkout();
+    expect(getState().activeWorkout).toBeUndefined();
+    expect(getState().routine).toBe(before.routine);
+    expect(getState().workouts).toBe(before.workouts);
+    expect(getState().sets).toBe(before.sets);
+  });
+  it("deletes associated sets and recalculates records and fatigue, preserving other workouts", () => {
+    const e = EXERCISES.find((x) => x.t === "pectorals");
+    if (!e) throw new Error("Missing exercise");
+    const ts = Date.now();
+    setState(() => ({ workouts: ["remove", "keep"].map((id) => ({ id, day: "lunes", ts, durationSec: 10, volume: 100, exIds: [e.id] })), sets: [
+      { workoutId: "remove", exId: e.id, kg: 50, reps: 10, ts },
+      { workoutId: "keep", exId: e.id, kg: 20, reps: 10, ts },
+    ] }));
+    deleteWorkout("remove");
+    expect(getState().workouts.map((w) => w.id)).toEqual(["keep"]);
+    expect(getState().sets.map((l) => l.workoutId)).toEqual(["keep"]);
+    expect(bestKg(getState(), e.id)).toBe(20);
+    expect(computeFatigue(getState(), ts).pecho).toBe(1);
   });
 });

@@ -39,9 +39,9 @@ function Login() {
     if (r.error) { setErr("No se pudo iniciar sesión con Google. Inténtalo de nuevo."); setBusy(false); }
   }
   return (
-    <div className="flex min-h-screen flex-col bg-hero px-6 pb-12 pt-24">
+    <div className="flex min-h-dvh flex-col px-6 pb-12 pt-[max(env(safe-area-inset-top),4rem)]">
       <div className="flex-1">
-        <h1><BrandLogo stacked className="mx-auto w-full max-w-sm" /></h1>
+        <h1><BrandLogo stacked className="mx-auto w-64 max-w-full" /></h1>
         <p className="mt-3 max-w-xs text-lg text-muted-foreground">Tu rutina, tu progreso y un entrenador personal con IA. Guardado en tu cuenta, en cualquier dispositivo.</p>
       </div>
       <button disabled={busy} onClick={google} className="flex h-14 items-center justify-center gap-3 rounded-2xl bg-foreground text-lg font-bold text-background disabled:opacity-60">

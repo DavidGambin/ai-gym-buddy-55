@@ -16,5 +16,6 @@
 - Active workouts belong to the per-user JSON document with an account-scoped device cache; why: preserve sessions across navigation and immediate reloads while isolating accounts.
 - Preserve entered load and store effective load separately on new set logs; why: volume uses equipment multipliers without rewriting historical records when profile weight changes.
 - Workout date changes go through the shared updateWorkout mutation that shifts associated set timestamps; why: history and fatigue must agree.
-- Local audio is owned by a root-level provider; why: navigating between workout screens must not stop playback.
+- Spotify account management lives in Profile and playback renders only after confirmed Premium status; why: keep free and unlinked accounts free of player UI.
+- Workout deletion removes its associated set logs through a shared store mutation; why: history, records and fatigue must remain consistent.
 - Brand images are imported through CDN asset pointers while install icons remain public files; why: keep image delivery lightweight and install icons compatible.

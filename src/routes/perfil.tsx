@@ -3,6 +3,7 @@ import { Save, Check } from "lucide-react";
 import { useState } from "react";
 import { PageHeader } from "@/components/ui-forma";
 import { Button } from "@/components/ui/button";
+import { SpotifyAccount } from "@/components/SpotifyPlayer";
 import { setState, useStore, type Profile } from "@/lib/store";
 
 export const Route = createFileRoute("/perfil")({
@@ -29,5 +30,6 @@ function ProfileForm({ initial }: { initial: Profile }) {
       </div>
       <Button type="submit" className="mt-6 h-12 w-full rounded-xl text-base font-bold">{saved ? <Check /> : <Save />}{saved ? "Medidas guardadas" : "Guardar medidas"}</Button>
     </form>
+    <div className="px-5"><SpotifyAccount /></div>
   </div>;
 }
