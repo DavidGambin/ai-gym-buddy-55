@@ -18,6 +18,7 @@ import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as ProgresoRouteImport } from './routes/progreso'
 import { Route as RutinaRouteImport } from './routes/rutina'
 import { Route as EjercicioIdRouteImport } from './routes/ejercicio.$id'
+import { Route as EntrenoIndexRouteImport } from './routes/entreno.index'
 import { Route as EntrenoDayRouteImport } from './routes/entreno.$day'
 import { Route as ApiPublicSpotifyCallbackRouteImport } from './routes/api/public/spotify/callback'
 
@@ -66,6 +67,11 @@ const EjercicioIdRoute = EjercicioIdRouteImport.update({
   path: '/ejercicio/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EntrenoIndexRoute = EntrenoIndexRouteImport.update({
+  id: '/entreno/',
+  path: '/entreno/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EntrenoDayRoute = EntrenoDayRouteImport.update({
   id: '/entreno/$day',
   path: '/entreno/$day',
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/rutina': typeof RutinaRoute
   '/ejercicio/$id': typeof EjercicioIdRoute
   '/entreno/$day': typeof EntrenoDayRoute
+  '/entreno/': typeof EntrenoIndexRoute
   '/api/public/spotify/callback': typeof ApiPublicSpotifyCallbackRoute
 }
 export interface FileRoutesByTo {
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/rutina': typeof RutinaRoute
   '/ejercicio/$id': typeof EjercicioIdRoute
   '/entreno/$day': typeof EntrenoDayRoute
+  '/entreno': typeof EntrenoIndexRoute
   '/api/public/spotify/callback': typeof ApiPublicSpotifyCallbackRoute
 }
 export interface FileRoutesById {
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/rutina': typeof RutinaRoute
   '/ejercicio/$id': typeof EjercicioIdRoute
   '/entreno/$day': typeof EntrenoDayRoute
+  '/entreno/': typeof EntrenoIndexRoute
   '/api/public/spotify/callback': typeof ApiPublicSpotifyCallbackRoute
 }
 export interface FileRouteTypes {
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/rutina'
     | '/ejercicio/$id'
     | '/entreno/$day'
+    | '/entreno/'
     | '/api/public/spotify/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/rutina'
     | '/ejercicio/$id'
     | '/entreno/$day'
+    | '/entreno'
     | '/api/public/spotify/callback'
   id:
     | '__root__'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/rutina'
     | '/ejercicio/$id'
     | '/entreno/$day'
+    | '/entreno/'
     | '/api/public/spotify/callback'
   fileRoutesById: FileRoutesById
 }
@@ -171,6 +183,7 @@ export interface RootRouteChildren {
   RutinaRoute: typeof RutinaRoute
   EjercicioIdRoute: typeof EjercicioIdRoute
   EntrenoDayRoute: typeof EntrenoDayRoute
+  EntrenoIndexRoute: typeof EntrenoIndexRoute
   ApiPublicSpotifyCallbackRoute: typeof ApiPublicSpotifyCallbackRoute
 }
 
@@ -239,6 +252,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EjercicioIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/entreno/': {
+      id: '/entreno/'
+      path: '/entreno'
+      fullPath: '/entreno/'
+      preLoaderRoute: typeof EntrenoIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/entreno/$day': {
       id: '/entreno/$day'
       path: '/entreno/$day'
@@ -267,6 +287,7 @@ const rootRouteChildren: RootRouteChildren = {
   RutinaRoute: RutinaRoute,
   EjercicioIdRoute: EjercicioIdRoute,
   EntrenoDayRoute: EntrenoDayRoute,
+  EntrenoIndexRoute: EntrenoIndexRoute,
   ApiPublicSpotifyCallbackRoute: ApiPublicSpotifyCallbackRoute,
 }
 export const routeTree = rootRouteImport
