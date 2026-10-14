@@ -137,13 +137,26 @@ export function CoachChat({ compact = false }: { compact?: boolean }) {
   );
 }
 
+const FAB_KEY = "spotterbro.fabPos";
 export function CoachFab() {
   const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const drag = useRef<{ dx: number; dy: number; sx: number; sy: number; moved: boolean } | null>(null);
+  const clamp = (x: number, y: number) => ({ x: Math.min(Math.max(8, x), window.innerWidth - 64), y: Math.min(Math.max(8, y), window.innerHeight - 64) });
+  useEffect(() => { try { const p = JSON.parse(localStorage.getItem(FAB_KEY) || "null"); if (p) setPos(clamp(p.x, p.y)); } catch { /* */ } }, []);
   return (
     <>
-      <Button variant="ghost" onClick={() => setOpen(true)} aria-label="Abrir coach IA" className="fixed bottom-[calc(env(safe-area-inset-bottom)+15rem)] right-4 z-40 grid h-14 w-14 place-items-center rounded-full bg-primary text-primary-foreground glow">
+      <button
+        type="button"
+        aria-label="Abrir coach IA (arrastra para mover)"
+        style={pos ? { left: pos.x, top: pos.y, touchAction: "none" } : { touchAction: "none" }}
+        className={`fixed z-40 grid h-14 w-14 place-items-center rounded-full bg-primary text-primary-foreground glow ${pos ? "" : "bottom-[calc(env(safe-area-inset-bottom)+15rem)] right-4"}`}
+        onPointerDown={(e) => { const r = e.currentTarget.getBoundingClientRect(); drag.current = { dx: e.clientX - r.left, dy: e.clientY - r.top, sx: e.clientX, sy: e.clientY, moved: false }; e.currentTarget.setPointerCapture(e.pointerId); }}
+        onPointerMove={(e) => { const d = drag.current; if (!d) return; if (Math.hypot(e.clientX - d.sx, e.clientY - d.sy) > 6) d.moved = true; if (d.moved) setPos(clamp(e.clientX - d.dx, e.clientY - d.dy)); }}
+        onPointerUp={() => { const d = drag.current; drag.current = null; if (!d) return; if (d.moved) setPos((p) => { if (p) localStorage.setItem(FAB_KEY, JSON.stringify(p)); return p; }); else setOpen(true); }}
+      >
         <Sparkles />
-      </Button>
+      </button>
       {open && (
         <div className="fixed inset-0 z-50 flex flex-col bg-background/60 backdrop-blur-sm" onClick={() => setOpen(false)}>
           <div role="dialog" aria-modal="true" aria-label="Coach IA" className="mx-auto mt-auto flex h-[85dvh] min-h-0 w-full max-w-2xl flex-col rounded-t-3xl border-t border-border bg-background" onClick={(e) => e.stopPropagation()}>

@@ -2,7 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Dumbbell, Home, LineChart, Sparkles, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { EX_BY_ID, eqLabel, gifUrl, muscleLabel } from "@/lib/exercises";
-import { fmt, todayKey, useStore } from "@/lib/store";
+import { fmt, useStore } from "@/lib/store";
 
 export function BottomNav() {
   const path = useRouterState({ select: (s) => s.location.pathname });
@@ -21,7 +21,7 @@ export function BottomNav() {
         {items.map(({ to, label, Icon }) => {
           const active = to === "/entreno/$day" ? path.startsWith("/entreno") : to === "/" ? path === "/" : path.startsWith(to);
           return (
-            <Link key={to} to={to} params={to === "/entreno/$day" ? { day: activeWorkout?.day ?? todayKey() } : {}} className={`flex h-[62px] flex-col items-center relative min-w-0 gap-1 px-2 py-1 text-[11px] font-semibold ${active ? "text-primary" : "text-muted-foreground"}`}>
+            <Link key={to} {...(to === "/entreno/$day" ? (activeWorkout ? { to: "/entreno/$day", params: { day: activeWorkout.day } } : { to: "/entreno" }) : { to })} className={`flex h-[62px] flex-col items-center relative min-w-0 gap-1 px-2 py-1 text-[11px] font-semibold ${active ? "text-primary" : "text-muted-foreground"}`}>
               <Icon className="h-6 w-6" strokeWidth={active ? 2.4 : 1.8} />{label}
                {to === "/entreno/$day" && activeWorkout && <span className="motion-safe:animate-pulse whitespace-nowrap text-[9px] font-bold text-primary">En curso</span>}
             </Link>
