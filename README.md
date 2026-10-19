@@ -1,6 +1,4 @@
-# Forma: Tu Coach IA
-
-Crea una app web mobile-first (pensada para iPhone, instalable como PWA) llamada "Forma": una app de entrenamiento de gimnasio estilo Hevy, con un asistente de IA que actúa como entrenador personal. Toda la interfaz en español.
+# SpotterBro.ai: Tu Coach con IA
 
 ## DISEÑO
 - Tema oscuro. Fondo #0E0F13, tarjetas #1A1C23, bordes #2E3240, texto secundario #8A8F9E.
