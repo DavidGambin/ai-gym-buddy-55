@@ -1,5 +1,16 @@
 # SpotterBro.ai: Tu Coach con IA
+Aplicación web progresiva (PWA) mobile-first diseñada para llevar el registro de entrenamientos de fuerza al siguiente nivel, combinando la agilidad de apps como Hevy con el poder de un entrenador personal con IA.
 
+### ✨ Características principales
+- **Entrenador IA interactivo:** Adapta series, cambia ejercicios según molestias o máquinas ocupadas y resuelve dudas en tiempo real.
+- **Mapa anatómico de calor:** Visualización dinámica de fatiga muscular y recuperación a lo largo del tiempo.
+- **Biblioteca de +1.300 ejercicios:** Animaciones visuales, ejecución paso a paso y filtrado por grupos musculares.
+- **Entreno en vivo y PRs:** Registro intuitivo de series, volumen acumulado y detección automática de nuevos récords personales.
+- **Integración con Spotify:** Control de música durante la sesión para cuentas Premium.
+
+### 🛠️ Stack tecnológico
+- **Frontend / Fullstack:** TanStack Start v1, React 19, TypeScript, Tailwind CSS.
+- **Backend & Auth:** Lovable Cloud (Supabase PostgreSQL & Auth).
 ## DISEÑO
 - Tema oscuro. Fondo #0E0F13, tarjetas #1A1C23, bordes #2E3240, texto secundario #8A8F9E.
 - Color de acento principal: lima #C6FF3D (botones primarios, volumen, checks, números destacados). Secundarios: coral #FF6B4A, morado #6C5CE7, azul marino #1B2A4A.
